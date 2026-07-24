@@ -206,7 +206,9 @@ export default function PlacementTestPage() {
       <div className="max-w-sm mx-auto">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <img src="/logo-mark.png" alt="Arabiya+" className="h-12 w-auto" />
+            <Link href="/">
+              <img src="/logo-mark.png" alt="Arabiya+" className="h-12 w-auto" />
+            </Link>
             <span className="kufi text-base text-gold-light">Test de niveau</span>
           </div>
           <span className="text-sm opacity-60">{displayIndex + 1} / {estimatedTotal}</span>
