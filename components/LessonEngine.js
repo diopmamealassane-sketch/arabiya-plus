@@ -16,6 +16,8 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
   const [reveal, setReveal] = useState(null);
   const [orderChosen, setOrderChosen] = useState([]);
   const [xpEarned, setXpEarned] = useState(0);
+  const [correctCount, setCorrectCount] = useState(0);
+  const [gradedCount, setGradedCount] = useState(0);
   const [shake, setShake] = useState(false);
   const [lastSpokenOk, setLastSpokenOk] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -84,6 +86,10 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
       setIsCorrect(data.correct);
       setReveal(data.reveal);
       setXpEarned((x) => x + (data.xp_awarded ?? 0));
+      if (step.kind !== "intro") {
+        setGradedCount((c) => c + 1);
+        if (data.correct) setCorrectCount((c) => c + 1);
+      }
       setAnswered(true);
       if (!data.correct) {
         setShake(true);
@@ -93,6 +99,7 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
       // If grading fails (e.g. offline), don't strand the user — let them
       // continue without XP rather than block the lesson.
       setIsCorrect(false);
+      if (step.kind !== "intro") setGradedCount((c) => c + 1);
       setAnswered(true);
     } finally {
       setSubmitting(false);
@@ -127,6 +134,18 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
     setStepIndex((i) => i + 1);
   }
 
+  // Note sur 20, calculée sur les exercices notables uniquement (les écrans
+  // "intro" ne comptent pas — ce ne sont pas des questions, juste des
+  // flashcards de découverte).
+  const note = gradedCount > 0 ? Math.round((correctCount / gradedCount) * 20) : 20;
+  const appreciation =
+    note >= 18 ? "Excellent !" :
+    note >= 16 ? "Très bien !" :
+    note >= 14 ? "Bien." :
+    note >= 12 ? "Assez bien." :
+    note >= 10 ? "Passable." :
+    "Peut mieux faire.";
+
   if (done) {
     return (
       <main className="geo-bg min-h-screen flex items-center justify-center px-4">
@@ -134,8 +153,17 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
           <p className="uppercase tracking-widest text-xs text-[#8a8264] font-semibold mb-2">
             Leçon terminée
           </p>
-          <h2 className="arabic text-3xl mb-2">أَحْسَنْتَ!</h2>
-          <p className="text-sm text-[#6b6350] mb-6">+{xpEarned} XP gagnés</p>
+          <h2 className="arabic text-3xl mb-4">أَحْسَنْتَ!</h2>
+
+          <div className="flex items-center justify-center gap-3 mb-1">
+            <span className="text-4xl font-black text-ink">{note}</span>
+            <span className="text-lg text-[#8a8264] font-semibold">/ 20</span>
+          </div>
+          <p className="text-sm font-semibold text-[#7a5c14] mb-1">{appreciation}</p>
+          <p className="text-xs text-[#8a8264] mb-6">
+            {correctCount} / {gradedCount} bonnes réponses · +{xpEarned} XP
+          </p>
+
           <button
             onClick={() => router.push("/dashboard")}
             className="w-full bg-gradient-to-b from-gold-light to-gold text-[#241A02] font-bold py-3 rounded-xl"
