@@ -7,11 +7,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        ink: "#141F38",
-        "ink-2": "#1D2E52",
-        "ink-3": "#263B66",
-        gold: "#CBA135",
-        "gold-light": "#E7C767",
+        ink: "#142038",
+        "ink-2": "#1C2E4D",
+        "ink-3": "#253A63",
+        gold: "#D1AA41",
+        "gold-light": "#E5C670",
         parchment: "#F4EEDF",
         "parchment-dim": "#DCD3BC",
         teal: "#2E8C82",
