@@ -6,8 +6,9 @@ export default function LandingPage() {
     <main className="geo-bg min-h-screen">
       <div className="max-w-5xl mx-auto px-6 py-20">
         <nav className="flex items-center justify-between mb-20">
-          <span className="kufi text-xl text-gold-light">Arabiya+</span>
+          <img src="/logo-mark.png" alt="Arabiya+" className="h-10 w-auto" />
           <div className="flex gap-6 items-center text-sm">
+            <Link href="/test-niveau" className="opacity-80 hover:opacity-100">Test de niveau</Link>
             <Link href="/pricing" className="opacity-80 hover:opacity-100">Tarifs</Link>
             <Link href="/login" className="opacity-80 hover:opacity-100">Se connecter</Link>
             <Link
@@ -38,6 +39,11 @@ export default function LandingPage() {
           >
             Commencer gratuitement <ArrowRight size={18} />
           </Link>
+          <div className="mt-4">
+            <Link href="/test-niveau" className="text-sm underline opacity-70 hover:opacity-100">
+              Déjà quelques bases ? Testez votre niveau gratuitement
+            </Link>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 mt-24">
