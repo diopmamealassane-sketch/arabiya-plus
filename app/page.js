@@ -6,7 +6,7 @@ export default function LandingPage() {
     <main className="geo-bg min-h-screen">
       <div className="max-w-5xl mx-auto px-6 py-20">
         <nav className="flex items-center justify-between mb-20">
-          <img src="/logo-mark.png" alt="Arabiya+" className="h-10 w-auto" />
+          <img src="/logo-mark.png" alt="Arabiya+" className="h-16 w-auto" />
           <div className="flex gap-6 items-center text-sm">
             <Link href="/test-niveau" className="opacity-80 hover:opacity-100">Test de niveau</Link>
             <Link href="/pricing" className="opacity-80 hover:opacity-100">Tarifs</Link>
