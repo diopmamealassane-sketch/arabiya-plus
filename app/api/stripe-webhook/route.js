@@ -33,10 +33,18 @@ export async function POST(request) {
     }
     case "customer.subscription.updated": {
       const sub = event.data.object;
+      // "trialing" = accès pendant l'essai gratuit, à traiter comme actif.
+      // "canceled" / "unpaid" / "incomplete_expired" = accès révoqué.
+      // Tout le reste (ex: échec de paiement récurrent) = en retard.
+      let status;
+      if (["active", "trialing"].includes(sub.status)) status = "active";
+      else if (["canceled", "unpaid", "incomplete_expired"].includes(sub.status)) status = "canceled";
+      else status = "past_due";
+
       await db
         .from("subscriptions")
         .update({
-          status: sub.status === "active" ? "active" : "past_due",
+          status,
           current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
         })
         .eq("stripe_customer_id", sub.customer);
