@@ -34,7 +34,7 @@ export default function PricingPage() {
         <p className="opacity-70 mb-3">
           30 jours d'essai gratuit sur tous les plans Premium — annulez à tout moment avant la fin de l'essai, sans frais.
         </p>
-        <p className="text-xs opacity-50 mb-12">
+        <p className="text-sm opacity-50 mb-12">
           Une carte bancaire est demandée à l'inscription pour activer l'essai, mais vous n'êtes prélevé qu'à son terme.
         </p>
 
@@ -42,7 +42,7 @@ export default function PricingPage() {
           <div className="bg-parchment text-ink rounded-2xl p-6">
             <h2 className="font-bold text-lg mb-1">Gratuit</h2>
             <p className="text-2xl font-bold mb-4">0 €</p>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-2 text-base">
               <Item>2 premières unités du Cycle 1</Item>
               <Item>XP et série illimités</Item>
               <Item>1 révision par jour</Item>
@@ -51,7 +51,7 @@ export default function PricingPage() {
 
           <div className="bg-ink-2 border-2 border-gold rounded-2xl p-6">
             <h2 className="font-bold text-lg mb-1 text-gold-light">Premium</h2>
-            <p className="text-sm text-gold-light font-semibold mb-4">30 jours offerts, puis :</p>
+            <p className="text-base text-gold-light font-semibold mb-4">30 jours offerts, puis :</p>
 
             <div className="space-y-2 mb-5">
               <button
@@ -72,18 +72,18 @@ export default function PricingPage() {
                   selectedPlan === "annual" ? "border-gold bg-white/5" : "border-white/15"
                 }`}
               >
-                <span className="absolute -top-2.5 right-3 bg-gold text-[#241A02] text-[10px] font-black px-2 py-0.5 rounded-full">
+                <span className="absolute -top-2.5 right-3 bg-gold text-[#241A02] text-xs font-black px-2 py-0.5 rounded-full">
                   -15%
                 </span>
                 <div className="flex items-center justify-between">
                   <span className="font-semibold">Annuel</span>
                   <span className="font-bold">101,90 € / an</span>
                 </div>
-                <p className="text-xs opacity-60 mt-1">soit 8,49 € / mois</p>
+                <p className="text-sm opacity-60 mt-1">soit 8,49 € / mois</p>
               </button>
             </div>
 
-            <ul className="space-y-2 text-sm mb-6">
+            <ul className="space-y-2 text-base mb-6">
               <Item light>Cycle 1 (A1) complet</Item>
               <Item light>Révisions illimitées</Item>
               <Item light>Tableau de bord détaillé</Item>
@@ -106,7 +106,7 @@ export default function PricingPage() {
 function Item({ children, light }) {
   return (
     <li className={`flex items-center gap-2 ${light ? "" : "text-ink"}`}>
-      <Check size={16} className="text-teal shrink-0" /> {children}
+      <Check size={18} className="text-teal shrink-0" /> {children}
     </li>
   );
 }
