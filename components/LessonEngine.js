@@ -1,11 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Volume2, X, Check, ArrowRight, RotateCcw } from "lucide-react";
+import { Volume2, X, Check, ArrowRight, ArrowLeft, RotateCcw, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
-export default function LessonEngine({ lessonTitle, lessonId, steps }) {
+export default function LessonEngine({
+  lessonTitle,
+  lessonId,
+  steps,
+  prevLessonId,
+  nextLessonId,
+  alreadyCompleted,
+}) {
   const router = useRouter();
   const supabase = createClient();
 
@@ -25,6 +32,21 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
 
   const done = stepIndex >= steps.length;
   const step = !done ? steps[stepIndex] : null;
+
+  // Corrige un vrai bug : les options venaient de la base dans un ordre où
+  // la bonne réponse était systématiquement en première position. On les
+  // mélange une fois par question (stable pendant qu'elle est affichée),
+  // sans jamais toucher à `step.options` lui-même (qui reste la source
+  // de vérité envoyée au serveur pour la validation).
+  const shuffledOptions = useMemo(() => {
+    if (!step?.options) return [];
+    const arr = [...step.options];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }, [step?.id]);
 
   useEffect(() => {
     setSelected(null);
@@ -165,11 +187,20 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
           </p>
 
           <button
-            onClick={() => router.push("/dashboard")}
-            className="w-full bg-gradient-to-b from-gold-light to-gold text-[#241A02] font-bold py-3 rounded-xl"
+            onClick={() => (nextLessonId ? router.push(`/lesson/${nextLessonId}`) : router.push("/dashboard"))}
+            className="w-full bg-gradient-to-b from-gold-light to-gold text-[#241A02] font-bold py-3 rounded-xl flex items-center justify-center gap-2"
           >
-            Retour au tableau de bord
+            {nextLessonId ? "Leçon suivante" : "Retour au tableau de bord"}
+            <ArrowRight size={20} />
           </button>
+          {nextLessonId && (
+            <button
+              onClick={() => router.push("/dashboard")}
+              className="w-full mt-3 py-2 text-sm text-[#8a8264]"
+            >
+              Retour au tableau de bord
+            </button>
+          )}
         </div>
       </main>
     );
@@ -182,8 +213,34 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
           <button onClick={() => router.push("/dashboard")} className="opacity-70">
             <X size={24} />
           </button>
-          <span className="text-sm opacity-60">{stepIndex + 1} / {steps.length}</span>
+          <div className="flex items-center gap-3">
+            {prevLessonId && (
+              <button
+                onClick={() => router.push(`/lesson/${prevLessonId}`)}
+                className="opacity-70 flex items-center gap-1 text-sm font-semibold"
+                title="Leçon précédente"
+              >
+                <ArrowLeft size={16} />
+              </button>
+            )}
+            <span className="text-sm opacity-60">{stepIndex + 1} / {steps.length}</span>
+            {nextLessonId && (
+              <button
+                onClick={() => router.push(`/lesson/${nextLessonId}`)}
+                className="opacity-70 flex items-center gap-1 text-sm font-semibold"
+                title="Passer à la leçon suivante"
+              >
+                <ArrowRight size={16} />
+              </button>
+            )}
+          </div>
         </div>
+
+        {alreadyCompleted && (
+          <div className="bg-teal/15 border border-teal/40 rounded-xl px-4 py-2.5 mb-4 flex items-center gap-2 text-teal text-sm font-semibold">
+            <CheckCircle2 size={16} /> Leçon déjà validée — vous pouvez la refaire ou passer à la suivante.
+          </div>
+        )}
 
         <div className="flex gap-1.5 mb-6">
           {steps.map((_, i) => (
@@ -247,7 +304,7 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
                 </button>
               </div>
               <div className="flex flex-col gap-2">
-                {(step.options ?? []).map((opt) => (
+                {(shuffledOptions).map((opt) => (
                   <OptionButton
                     key={opt}
                     label={opt}
@@ -266,7 +323,7 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
             <>
               <p className="font-semibold mb-4">Comment dit-on « {step.promptFr} » ?</p>
               <div className="flex flex-col gap-2">
-                {(step.options ?? []).map((opt) => (
+                {(shuffledOptions).map((opt) => (
                   <OptionButton
                     key={opt.id}
                     arabicLabel={opt.arabic_vocalized}
@@ -336,7 +393,7 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
                 )}
               </div>
               <div className="flex flex-col gap-2">
-                {(step.options ?? []).map((opt) => (
+                {(shuffledOptions).map((opt) => (
                   <OptionButton
                     key={opt}
                     label={opt}
