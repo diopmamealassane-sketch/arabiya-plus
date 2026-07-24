@@ -53,18 +53,18 @@ export default async function DashboardPage() {
         <div className="flex items-center justify-between relative z-10">
           <img src="/logo-mark.png" alt="Arabiya+" className="h-14 w-auto" />
           <div className="flex gap-2.5">
-            <span className="bg-white/15 backdrop-blur rounded-full px-3.5 py-1.5 text-xs font-extrabold flex items-center gap-1.5">
-              <Flame size={14} /> {stats?.streak_count ?? 0} jours
+            <span className="bg-white/15 backdrop-blur rounded-full px-3.5 py-1.5 text-sm font-extrabold flex items-center gap-1.5">
+              <Flame size={16} /> {stats?.streak_count ?? 0} jours
             </span>
-            <span className="bg-white/15 backdrop-blur rounded-full px-3.5 py-1.5 text-xs font-extrabold flex items-center gap-1.5">
-              <Star size={14} /> {stats?.xp_total ?? 0} XP
+            <span className="bg-white/15 backdrop-blur rounded-full px-3.5 py-1.5 text-sm font-extrabold flex items-center gap-1.5">
+              <Star size={16} /> {stats?.xp_total ?? 0} XP
             </span>
           </div>
         </div>
 
         <div className="relative z-10 mt-5">
           <h1 className="arabic text-3xl" dir="rtl">مَرْحَبًا!</h1>
-          <p className="text-sm text-white/70 font-semibold mt-1">
+          <p className="text-base text-white/70 font-semibold mt-1">
             {completedLessons} leçon{completedLessons !== 1 ? "s" : ""} terminée{completedLessons !== 1 ? "s" : ""} sur {totalLessons}
           </p>
         </div>
@@ -80,14 +80,14 @@ export default async function DashboardPage() {
       <div className="max-w-2xl mx-auto px-5 -mt-5 relative z-10 pb-16">
         {!isPremium && (
           <div className="bg-white border border-gold/30 rounded-2xl p-4 mb-10 shadow-md flex items-center justify-between gap-3">
-            <p className="text-sm text-ink/70 font-semibold">
+            <p className="text-base text-ink/70 font-semibold">
               2 unités gratuites débloquées. Passez Premium pour le reste du parcours.
             </p>
             <Link
               href="/pricing"
-              className="bg-gradient-to-b from-gold-light to-gold text-[#241A02] text-sm font-extrabold px-4 py-2.5 rounded-xl whitespace-nowrap flex items-center gap-1.5"
+              className="bg-gradient-to-b from-gold-light to-gold text-[#241A02] text-base font-extrabold px-4 py-2.5 rounded-xl whitespace-nowrap flex items-center gap-1.5"
             >
-              Tarifs <ArrowRight size={14} />
+              Tarifs <ArrowRight size={16} />
             </Link>
           </div>
         )}
@@ -99,7 +99,7 @@ export default async function DashboardPage() {
             isPremium={isPremium}
           />
         ) : (
-          <p className="text-center text-ink/50 text-sm py-20">
+          <p className="text-center text-ink/50 text-base py-20">
             Aucun contenu pour le moment — exécutez le seed Supabase pour voir la leçon de démonstration.
           </p>
         )}
