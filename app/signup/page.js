@@ -41,7 +41,7 @@ export default function SignupPage() {
   return (
     <main className="geo-bg min-h-screen flex items-center justify-center px-4">
       <form onSubmit={handleSubmit} className="bg-parchment text-ink rounded-2xl p-8 w-full max-w-sm float-in">
-        <img src="/images/logo-mark.png" alt="Arabiya+" className="h-14 w-auto mx-auto mb-5" />
+        <img src="/logo-mark.png" alt="Arabiya+" className="h-24 w-auto mx-auto mb-5" />
         <h1 className="text-xl font-bold mb-6">Créer un compte</h1>
         <label className="block text-sm font-semibold mb-1">Email</label>
         <input
