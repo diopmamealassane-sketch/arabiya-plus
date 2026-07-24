@@ -150,7 +150,7 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
     return (
       <main className="geo-bg min-h-screen flex items-center justify-center px-4">
         <div className="bg-parchment text-ink rounded-2xl p-8 max-w-sm w-full text-center float-in">
-          <p className="uppercase tracking-widest text-xs text-[#8a8264] font-semibold mb-2">
+          <p className="uppercase tracking-widest text-sm text-[#8a8264] font-semibold mb-2">
             Leçon terminée
           </p>
           <h2 className="arabic text-3xl mb-4">أَحْسَنْتَ!</h2>
@@ -159,8 +159,8 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
             <span className="text-4xl font-black text-ink">{note}</span>
             <span className="text-lg text-[#8a8264] font-semibold">/ 20</span>
           </div>
-          <p className="text-sm font-semibold text-[#7a5c14] mb-1">{appreciation}</p>
-          <p className="text-xs text-[#8a8264] mb-6">
+          <p className="text-base font-semibold text-[#7a5c14] mb-1">{appreciation}</p>
+          <p className="text-sm text-[#8a8264] mb-6">
             {correctCount} / {gradedCount} bonnes réponses · +{xpEarned} XP
           </p>
 
@@ -180,9 +180,9 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
       <div className="max-w-sm mx-auto">
         <div className="flex items-center justify-between mb-4">
           <button onClick={() => router.push("/dashboard")} className="opacity-70">
-            <X size={22} />
+            <X size={24} />
           </button>
-          <span className="text-xs opacity-60">{stepIndex + 1} / {steps.length}</span>
+          <span className="text-sm opacity-60">{stepIndex + 1} / {steps.length}</span>
         </div>
 
         <div className="flex gap-1.5 mb-6">
@@ -200,7 +200,7 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
         </div>
 
         <div className={`bg-parchment text-ink rounded-2xl p-6 float-in ${shake ? "shake" : ""}`}>
-          <p className="text-xs uppercase tracking-wide text-[#8a8264] font-semibold mb-3">
+          <p className="text-sm uppercase tracking-wide text-[#8a8264] font-semibold mb-3">
             {lessonTitle}
           </p>
 
@@ -208,7 +208,7 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
             <>
               <div className="text-center py-3">
                 <div className="arabic text-5xl" dir="rtl">{step.word?.arabic_vocalized}</div>
-                <div className="italic text-[#6b6350] mt-2 text-sm">{step.word?.transliteration}</div>
+                <div className="italic text-[#6b6350] mt-2 text-base">{step.word?.transliteration}</div>
                 <div className="font-semibold mt-1">{step.word?.french}</div>
               </div>
               <div className="flex justify-center">
@@ -216,11 +216,11 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
                   onClick={() => speak(step.word?.arabic_vocalized)}
                   className="w-12 h-12 rounded-full bg-ink text-gold-light flex items-center justify-center speak-pulse"
                 >
-                  <Volume2 size={20} />
+                  <Volume2 size={22} />
                 </button>
               </div>
               {lastSpokenOk === false && (
-                <p className="text-xs text-center text-[#8a8264] mt-3">
+                <p className="text-sm text-center text-[#8a8264] mt-3">
                   🔇 Pas de voix arabe sur cet appareil — appuyez-vous sur la transcription phonétique.
                 </p>
               )}
@@ -229,7 +229,7 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
                 disabled={submitting}
                 className="w-full mt-6 bg-gradient-to-b from-gold-light to-gold text-[#241A02] font-bold py-3 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50"
               >
-                J'ai compris <ArrowRight size={18} />
+                J'ai compris <ArrowRight size={20} />
               </button>
             </>
           )}
@@ -243,7 +243,7 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
                   onClick={() => speak(step.promptWord?.arabic_vocalized)}
                   className="w-10 h-10 mx-auto mt-2 rounded-full bg-ink text-gold-light flex items-center justify-center"
                 >
-                  <Volume2 size={16} />
+                  <Volume2 size={18} />
                 </button>
               </div>
               <div className="flex flex-col gap-2">
@@ -278,7 +278,7 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
                   />
                 ))}
               </div>
-              {step.note && <p className="text-xs italic text-[#8a8264] mt-3">{step.note}</p>}
+              {step.note && <p className="text-sm italic text-[#8a8264] mt-3">{step.note}</p>}
             </>
           )}
 
@@ -287,7 +287,7 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
               <p className="font-semibold mb-4">{step.instruction}</p>
               <div className="min-h-[58px] border-2 border-dashed border-black/15 rounded-xl flex items-center gap-2 px-3 py-2 flex-wrap justify-end" dir="rtl">
                 {orderChosen.length === 0 && (
-                  <span className="text-xs text-[#a89f83]" dir="ltr">
+                  <span className="text-sm text-[#a89f83]" dir="ltr">
                     Touchez les mots ci-dessous dans l'ordre
                   </span>
                 )}
@@ -310,8 +310,8 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
                 ))}
               </div>
               {orderChosen.length > 0 && !answered && (
-                <button onClick={resetOrder} className="mt-4 text-xs flex items-center gap-1 opacity-60">
-                  <RotateCcw size={13} /> Recommencer
+                <button onClick={resetOrder} className="mt-4 text-sm flex items-center gap-1 opacity-60">
+                  <RotateCcw size={15} /> Recommencer
                 </button>
               )}
             </>
@@ -325,10 +325,10 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
                   onClick={() => speak(step.word?.arabic_vocalized)}
                   className="w-16 h-16 rounded-full bg-ink text-gold-light flex items-center justify-center speak-pulse"
                 >
-                  <Volume2 size={26} />
+                  <Volume2 size={28} />
                 </button>
                 {lastSpokenOk === false && (
-                  <p className="text-xs text-center text-[#8a8264] mt-3">
+                  <p className="text-sm text-center text-[#8a8264] mt-3">
                     🔇 Pas de voix arabe disponible.
                     <br />
                     Prononciation phonétique : <em>{step.word?.transliteration}</em>
@@ -353,7 +353,7 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
 
           {answered && step.kind !== "intro" && (
             <>
-              <p className={`text-sm font-semibold text-center mt-4 ${isCorrect ? "text-teal" : "text-rust"}`}>
+              <p className={`text-base font-semibold text-center mt-4 ${isCorrect ? "text-teal" : "text-rust"}`}>
                 {isCorrect ? "Parfait !" : "Pas tout à fait — la bonne réponse est en surbrillance."}
               </p>
               <button
@@ -362,7 +362,7 @@ export default function LessonEngine({ lessonTitle, lessonId, steps }) {
                   isCorrect ? "bg-teal" : "bg-rust"
                 }`}
               >
-                Continuer <ArrowRight size={18} />
+                Continuer <ArrowRight size={20} />
               </button>
             </>
           )}
@@ -385,7 +385,7 @@ function OptionButton({ label, arabicLabel, isSelected, isCorrectAnswer, isWrong
       className={`w-full text-left px-4 py-3 rounded-xl border-2 font-semibold flex items-center justify-between ${cls}`}
     >
       {arabicLabel ? <span className="arabic text-xl" dir="rtl">{arabicLabel}</span> : <span>{label}</span>}
-      {isCorrectAnswer && <Check size={18} className="text-teal" />}
+      {isCorrectAnswer && <Check size={20} className="text-teal" />}
     </button>
   );
 }
