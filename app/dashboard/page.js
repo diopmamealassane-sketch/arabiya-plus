@@ -18,7 +18,8 @@ export default async function DashboardPage() {
       supabase.from("user_stats").select("*").eq("user_id", user.id).single(),
       supabase
         .from("units")
-        .select("id, title_fr, order_index, is_free, lessons(id, title_fr, order_index)")
+        .select("id, cycle, title_fr, order_index, is_free, lessons(id, title_fr, order_index)")
+        .order("cycle")
         .order("order_index"),
       supabase.from("user_progress").select("lesson_id, status").eq("user_id", user.id),
       supabase.from("subscriptions").select("status").eq("user_id", user.id).single(),
@@ -28,6 +29,26 @@ export default async function DashboardPage() {
     (progress ?? []).map((p) => [p.lesson_id, p.status])
   );
   const isPremium = subscription?.status === "active";
+
+  const CYCLE_LABELS = {
+    A1: "Cycle 1 — Débutant (A1)",
+    A2: "Cycle 2 — Élémentaire (A2)",
+    B1: "Cycle 3 — Intermédiaire (B1)",
+    B2: "Cycle 4 — Intermédiaire supérieur (B2)",
+    C1: "Cycle 5 — Avancé (C1)",
+    C2: "Cycle 6 — Expert (C2)",
+  };
+
+  // Group units by cycle, preserving the cycle order already applied by the query
+  const unitsByCycle = [];
+  for (const unit of units ?? []) {
+    let group = unitsByCycle.find((g) => g.cycle === unit.cycle);
+    if (!group) {
+      group = { cycle: unit.cycle, units: [] };
+      unitsByCycle.push(group);
+    }
+    group.units.push(unit);
+  }
 
   return (
     <main className="geo-bg min-h-screen px-4 py-10">
@@ -55,45 +76,58 @@ export default async function DashboardPage() {
           </div>
         )}
 
-        <div className="space-y-6">
-          {(units ?? []).map((unit) => {
-            const locked = !unit.is_free && !isPremium;
-            return (
-              <div key={unit.id} className="bg-parchment text-ink rounded-2xl p-5">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="font-bold">{unit.title_fr}</h2>
-                  {locked && <Lock size={16} className="opacity-50" />}
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {(unit.lessons ?? [])
-                    .sort((a, b) => a.order_index - b.order_index)
-                    .map((lesson) => {
-                      const status = progressByLesson[lesson.id] ?? "not_started";
-                      return locked ? (
-                        <span
-                          key={lesson.id}
-                          className="text-xs px-3 py-2 rounded-xl bg-black/5 opacity-40 cursor-not-allowed"
-                        >
-                          {lesson.title_fr}
-                        </span>
-                      ) : (
-                        <Link
-                          key={lesson.id}
-                          href={`/lesson/${lesson.id}`}
-                          className={`text-xs px-3 py-2 rounded-xl font-semibold ${
-                            status === "completed"
-                              ? "bg-teal/20 text-teal"
-                              : "bg-gold/20 text-[#7a5c14]"
-                          }`}
-                        >
-                          {lesson.title_fr}
-                        </Link>
-                      );
-                    })}
-                </div>
+        <div className="space-y-10">
+          {unitsByCycle.map((group) => (
+            <section key={group.cycle}>
+              <div className="flex items-center gap-3 mb-4">
+                <h1 className="text-gold-light font-bold text-sm uppercase tracking-wide">
+                  {CYCLE_LABELS[group.cycle] ?? group.cycle}
+                </h1>
+                <div className="flex-1 h-px bg-gold/20" />
               </div>
-            );
-          })}
+
+              <div className="space-y-6">
+                {group.units.map((unit) => {
+                  const locked = !unit.is_free && !isPremium;
+                  return (
+                    <div key={unit.id} className="bg-parchment text-ink rounded-2xl p-5">
+                      <div className="flex items-center justify-between mb-3">
+                        <h2 className="font-bold">{unit.title_fr}</h2>
+                        {locked && <Lock size={16} className="opacity-50" />}
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {(unit.lessons ?? [])
+                          .sort((a, b) => a.order_index - b.order_index)
+                          .map((lesson) => {
+                            const status = progressByLesson[lesson.id] ?? "not_started";
+                            return locked ? (
+                              <span
+                                key={lesson.id}
+                                className="text-xs px-3 py-2 rounded-xl bg-black/5 opacity-40 cursor-not-allowed"
+                              >
+                                {lesson.title_fr}
+                              </span>
+                            ) : (
+                              <Link
+                                key={lesson.id}
+                                href={`/lesson/${lesson.id}`}
+                                className={`text-xs px-3 py-2 rounded-xl font-semibold ${
+                                  status === "completed"
+                                    ? "bg-teal/20 text-teal"
+                                    : "bg-gold/20 text-[#7a5c14]"
+                                }`}
+                              >
+                                {lesson.title_fr}
+                              </Link>
+                            );
+                          })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          ))}
           {(units ?? []).length === 0 && (
             <p className="text-center opacity-60 text-sm">
               Aucun contenu pour le moment — exécutez le seed Supabase pour voir la leçon de démonstration.
