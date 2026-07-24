@@ -1,0 +1,155 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import {
+  Hand, Users, Hash, Palette, UtensilsCrossed, Clock, Home,
+  MessageCircle, BookOpen, Check, Lock, ChevronDown,
+} from "lucide-react";
+
+const CYCLE_LABELS = {
+  A1: "Cycle 1 — Débutant (A1)",
+  A2: "Cycle 2 — Élémentaire (A2)",
+  B1: "Cycle 3 — Intermédiaire (B1)",
+  B2: "Cycle 4 — Intermédiaire supérieur (B2)",
+  C1: "Cycle 5 — Avancé (C1)",
+  C2: "Cycle 6 — Expert (C2)",
+};
+
+// Icône par thème d'unité — reconnue sur un mot-clé du titre, pas sur un ID,
+// pour que le prochain contenu ajouté hérite automatiquement d'une icône
+// cohérente sans mapping à maintenir manuellement.
+function unitIcon(title) {
+  const t = title.toLowerCase();
+  if (t.includes("saluer") || t.includes("politesse")) return Hand;
+  if (t.includes("famille") || t.includes("ami")) return Users;
+  if (t.includes("chiffre") || t.includes("nombre")) return Hash;
+  if (t.includes("couleur")) return Palette;
+  if (t.includes("nourriture") || t.includes("repas")) return UtensilsCrossed;
+  if (t.includes("temps")) return Clock;
+  if (t.includes("objet") || t.includes("maison")) return Home;
+  if (t.includes("conversation") || t.includes("présent")) return MessageCircle;
+  return BookOpen;
+}
+
+export default function LearningPath({ unitsByCycle, progressByLesson, isPremium }) {
+  const [expandedUnitId, setExpandedUnitId] = useState(null);
+
+  // Trouve la première unité déverrouillée et non-terminée, tous cycles
+  // confondus dans l'ordre d'affichage — c'est elle qui reçoit le badge "or"
+  // et l'étiquette "Continuer ici".
+  let currentUnitId = null;
+  outer: for (const group of unitsByCycle) {
+    for (const unit of group.units) {
+      const locked = !unit.is_free && !isPremium;
+      const total = unit.lessons?.length ?? 0;
+      const doneCount = (unit.lessons ?? []).filter(
+        (l) => progressByLesson[l.id] === "completed"
+      ).length;
+      if (!locked && doneCount < total) {
+        currentUnitId = unit.id;
+        break outer;
+      }
+    }
+  }
+
+  return (
+    <div className="space-y-12">
+      {unitsByCycle.map((group) => (
+        <section key={group.cycle}>
+          <div className="flex items-center gap-3 mb-6">
+            <span className="bg-gold text-[#2A1F04] text-[11px] font-black uppercase tracking-wide px-3 py-1 rounded-full">
+              {group.cycle}
+            </span>
+            <h2 className="text-ink/60 font-extrabold text-sm">
+              {CYCLE_LABELS[group.cycle] ?? group.cycle}
+            </h2>
+          </div>
+
+          <div className="relative">
+            <div className="absolute left-1/2 top-2 bottom-2 -translate-x-1/2 border-l-2 border-dashed border-gold/40" />
+            <div className="relative space-y-8">
+              {group.units.map((unit, i) => {
+                const Icon = unitIcon(unit.title_fr);
+                const locked = !unit.is_free && !isPremium;
+                const total = unit.lessons?.length ?? 0;
+                const doneCount = (unit.lessons ?? []).filter(
+                  (l) => progressByLesson[l.id] === "completed"
+                ).length;
+                const isDone = total > 0 && doneCount === total;
+                const isCurrent = unit.id === currentUnitId;
+                const expanded = expandedUnitId === unit.id;
+                const align = i % 2 === 0 ? "justify-start" : "justify-end";
+
+                let circleCls = "bg-white border-4 border-ink/15 text-ink";
+                if (locked) circleCls = "bg-gray-200 border-4 border-white text-gray-400";
+                else if (isDone) circleCls = "bg-ink border-4 border-white text-white";
+                else if (isCurrent) circleCls = "bg-gold border-4 border-white text-[#2A1F04]";
+
+                return (
+                  <div key={unit.id}>
+                    <div className={`flex ${align}`}>
+                      <div className="w-40 flex flex-col items-center text-center relative">
+                        {isCurrent && (
+                          <span className="absolute -top-7 bg-ink text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg whitespace-nowrap">
+                            Continuer ici
+                          </span>
+                        )}
+                        <button
+                          onClick={() => !locked && setExpandedUnitId(expanded ? null : unit.id)}
+                          disabled={locked}
+                          className={`w-[72px] h-[72px] rounded-full flex items-center justify-center shadow-lg transition-transform active:scale-95 ${circleCls}`}
+                        >
+                          {locked ? <Lock size={26} /> : isDone ? <Check size={30} /> : <Icon size={28} />}
+                        </button>
+                        <p className="mt-2.5 font-extrabold text-sm text-ink leading-tight">
+                          {unit.title_fr}
+                        </p>
+                        <p className="text-[11px] font-bold text-ink/45 mt-0.5">
+                          {locked ? "Premium" : `${doneCount} / ${total} leçons`}
+                        </p>
+                      </div>
+                    </div>
+
+                    {expanded && !locked && (
+                      <div className="mt-4 bg-white rounded-2xl p-5 shadow-md border border-gold/20 float-in">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-10 h-10 rounded-xl bg-ink/5 flex items-center justify-center">
+                            <Icon size={20} className="text-ink" />
+                          </div>
+                          <h3 className="font-extrabold text-ink">{unit.title_fr}</h3>
+                          <ChevronDown size={16} className="text-ink/30 ml-auto" />
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {(unit.lessons ?? [])
+                            .sort((a, b) => a.order_index - b.order_index)
+                            .map((lesson) => {
+                              const status = progressByLesson[lesson.id] ?? "not_started";
+                              const cls =
+                                status === "completed"
+                                  ? "bg-ink/10 text-ink"
+                                  : "bg-gold/20 text-[#7a5c14]";
+                              return (
+                                <Link
+                                  key={lesson.id}
+                                  href={`/lesson/${lesson.id}`}
+                                  className={`text-xs px-3 py-2 rounded-xl font-bold ${cls}`}
+                                >
+                                  {status === "completed" ? "✓ " : ""}
+                                  {lesson.title_fr}
+                                </Link>
+                              );
+                            })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      ))}
+    </div>
+  );
+}
