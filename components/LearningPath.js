@@ -58,10 +58,10 @@ export default function LearningPath({ unitsByCycle, progressByLesson, isPremium
       {unitsByCycle.map((group) => (
         <section key={group.cycle}>
           <div className="flex items-center gap-3 mb-6">
-            <span className="bg-gold text-[#2A1F04] text-[11px] font-black uppercase tracking-wide px-3 py-1 rounded-full">
+            <span className="bg-gold text-[#2A1F04] text-xs font-black uppercase tracking-wide px-3 py-1 rounded-full">
               {group.cycle}
             </span>
-            <h2 className="text-ink/60 font-extrabold text-sm">
+            <h2 className="text-ink/60 font-extrabold text-base">
               {CYCLE_LABELS[group.cycle] ?? group.cycle}
             </h2>
           </div>
@@ -91,7 +91,7 @@ export default function LearningPath({ unitsByCycle, progressByLesson, isPremium
                     <div className={`flex ${align}`}>
                       <div className="w-40 flex flex-col items-center text-center relative">
                         {isCurrent && (
-                          <span className="absolute -top-7 bg-ink text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg whitespace-nowrap">
+                          <span className="absolute -top-7 bg-ink text-white text-xs font-extrabold px-2.5 py-1 rounded-lg whitespace-nowrap">
                             Continuer ici
                           </span>
                         )}
@@ -100,12 +100,12 @@ export default function LearningPath({ unitsByCycle, progressByLesson, isPremium
                           disabled={locked}
                           className={`w-[72px] h-[72px] rounded-full flex items-center justify-center shadow-lg transition-transform active:scale-95 ${circleCls}`}
                         >
-                          {locked ? <Lock size={26} /> : isDone ? <Check size={30} /> : <Icon size={28} />}
+                          {locked ? <Lock size={28} /> : isDone ? <Check size={32} /> : <Icon size={30} />}
                         </button>
-                        <p className="mt-2.5 font-extrabold text-sm text-ink leading-tight">
+                        <p className="mt-2.5 font-extrabold text-base text-ink leading-tight">
                           {unit.title_fr}
                         </p>
-                        <p className="text-[11px] font-bold text-ink/45 mt-0.5">
+                        <p className="text-xs font-bold text-ink/45 mt-0.5">
                           {locked ? "Premium" : `${doneCount} / ${total} leçons`}
                         </p>
                       </div>
@@ -115,10 +115,10 @@ export default function LearningPath({ unitsByCycle, progressByLesson, isPremium
                       <div className="mt-4 bg-white rounded-2xl p-5 shadow-md border border-gold/20 float-in">
                         <div className="flex items-center gap-3 mb-4">
                           <div className="w-10 h-10 rounded-xl bg-ink/5 flex items-center justify-center">
-                            <Icon size={20} className="text-ink" />
+                            <Icon size={22} className="text-ink" />
                           </div>
                           <h3 className="font-extrabold text-ink">{unit.title_fr}</h3>
-                          <ChevronDown size={16} className="text-ink/30 ml-auto" />
+                          <ChevronDown size={18} className="text-ink/30 ml-auto" />
                         </div>
                         <div className="flex flex-wrap gap-2">
                           {(unit.lessons ?? [])
@@ -133,7 +133,7 @@ export default function LearningPath({ unitsByCycle, progressByLesson, isPremium
                                 <Link
                                   key={lesson.id}
                                   href={`/lesson/${lesson.id}`}
-                                  className={`text-xs px-3 py-2 rounded-xl font-bold ${cls}`}
+                                  className={`text-sm px-3 py-2 rounded-xl font-bold ${cls}`}
                                 >
                                   {status === "completed" ? "✓ " : ""}
                                   {lesson.title_fr}
