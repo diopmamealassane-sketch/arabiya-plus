@@ -153,15 +153,15 @@ export default function PlacementTestPage() {
     return (
       <main className="geo-bg min-h-screen flex items-center justify-center px-4 py-12">
         <div className="bg-parchment text-ink rounded-2xl p-8 max-w-sm w-full text-center float-in">
-          <Sparkles className="mx-auto mb-3 text-gold" size={28} />
-          <p className="uppercase tracking-widest text-xs text-[#8a8264] font-semibold mb-2">
+          <Sparkles className="mx-auto mb-3 text-gold" size={30} />
+          <p className="uppercase tracking-widest text-sm text-[#8a8264] font-semibold mb-2">
             Résultat de votre test
           </p>
           <h2 className="text-2xl font-bold mb-1">{reco.level}</h2>
-          <p className="text-sm text-[#6b6350] mb-5">{reco.description}</p>
+          <p className="text-base text-[#6b6350] mb-5">{reco.description}</p>
 
           <div className="bg-white border-2 border-gold/40 rounded-xl p-4 mb-6">
-            <p className="text-xs uppercase tracking-wide text-[#8a8264] font-semibold mb-1">
+            <p className="text-sm uppercase tracking-wide text-[#8a8264] font-semibold mb-1">
               Point de départ recommandé
             </p>
             <p className="font-bold">{reco.unit}</p>
@@ -171,13 +171,13 @@ export default function PlacementTestPage() {
             href="/signup"
             className="w-full bg-gradient-to-b from-gold-light to-gold text-[#241A02] font-bold py-3 rounded-xl flex items-center justify-center gap-2"
           >
-            Commencer gratuitement <ArrowRight size={18} />
+            Commencer gratuitement <ArrowRight size={20} />
           </Link>
           <button
             onClick={restart}
-            className="w-full mt-3 py-2 text-xs text-[#8a8264] flex items-center justify-center gap-1"
+            className="w-full mt-3 py-2 text-sm text-[#8a8264] flex items-center justify-center gap-1"
           >
-            <RotateCcw size={12} /> Refaire le test
+            <RotateCcw size={14} /> Refaire le test
           </button>
         </div>
       </main>
@@ -190,9 +190,9 @@ export default function PlacementTestPage() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <img src="/logo-mark.png" alt="Arabiya+" className="h-12 w-auto" />
-            <span className="kufi text-sm text-gold-light">Test de niveau</span>
+            <span className="kufi text-base text-gold-light">Test de niveau</span>
           </div>
-          <span className="text-xs opacity-60">{index + 1} / {QUESTIONS.length}</span>
+          <span className="text-sm opacity-60">{index + 1} / {QUESTIONS.length}</span>
         </div>
 
         <div className="flex gap-1.5 mb-6">
@@ -253,7 +253,7 @@ export default function PlacementTestPage() {
           </div>
         </div>
 
-        <p className="text-center text-xs text-parchment-dim opacity-60 mt-6">
+        <p className="text-center text-sm text-parchment-dim opacity-60 mt-6">
           Gratuit, sans inscription — 10 questions, 2 minutes.
         </p>
       </div>
