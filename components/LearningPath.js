@@ -66,8 +66,8 @@ export default function LearningPath({ unitsByCycle, progressByLesson, isPremium
             </h2>
           </div>
 
-          <div className="relative">
-            <div className="absolute left-1/2 top-2 bottom-2 -translate-x-1/2 border-l-2 border-dashed border-gold/40" />
+          <div className="relative pt-8">
+            <div className="absolute left-1/2 top-10 bottom-2 -translate-x-1/2 border-l-2 border-dashed border-gold/40" />
             <div className="relative space-y-8">
               {group.units.map((unit, i) => {
                 const Icon = unitIcon(unit.title_fr);
