@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 import { nextBoxLevel, nextReviewDate } from "@/lib/srs";
+import { arabicAnswersMatch } from "@/lib/arabicNormalize";
 
 const XP_BY_KIND = {
   intro: 5,
@@ -10,6 +11,7 @@ const XP_BY_KIND = {
   listen: 10,
   order: 15,
   dictee: 15,
+  repeat_aloud: 8,
 };
 
 export async function POST(request) {
@@ -124,6 +126,8 @@ function revealCorrectAnswer(step) {
       return { wordId: step.payload.answer_word_id };
     case "order":
       return { orderWordIds: step.payload.answer_word_ids };
+    case "dictee":
+      return { value: step.payload.answer }; // le mot arabe correct, à afficher après coup
     default:
       return null;
   }
@@ -146,6 +150,15 @@ function evaluateAnswer(step, userAnswer) {
         JSON.stringify(userAnswer) ===
         JSON.stringify(step.payload.answer_word_ids)
       );
+    case "dictee":
+      // Écoute + écriture : compare le mot tapé au mot arabe attendu, en
+      // tolérant les harakat non saisies (peu de claviers les permettent).
+      return arabicAnswersMatch(userAnswer, step.payload.answer);
+    case "repeat_aloud":
+      // Pas de reconnaissance vocale (hors scope du MVP) : l'utilisateur
+      // s'auto-évalue. On fait confiance à sa réponse — le but est la
+      // pratique répétée, pas une note infaillible.
+      return userAnswer === true;
     default:
       return false;
   }
