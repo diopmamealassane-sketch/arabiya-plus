@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Volume2, X, Check, ArrowRight, ArrowLeft, RotateCcw, CheckCircle2 } from "lucide-react";
+import { Volume2, X, Check, ArrowRight, ArrowLeft, RotateCcw, CheckCircle2, Mic, PenLine } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LessonEngine({
@@ -28,6 +28,7 @@ export default function LessonEngine({
   const [shake, setShake] = useState(false);
   const [lastSpokenOk, setLastSpokenOk] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [typedAnswer, setTypedAnswer] = useState("");
   const voicesRef = useRef([]);
 
   const doneReportedRef = useRef(false);
@@ -56,6 +57,7 @@ export default function LessonEngine({
     setIsCorrect(false);
     setReveal(null);
     setOrderChosen([]);
+    setTypedAnswer("");
   }, [stepIndex]);
 
   useEffect(() => {
@@ -424,6 +426,103 @@ export default function LessonEngine({
                   />
                 ))}
               </div>
+            </>
+          )}
+
+          {step.kind === "dictee" && (
+            <>
+              <p className="font-semibold mb-1 flex items-center gap-2">
+                <PenLine size={18} /> Dictée — écoutez et écrivez le mot en arabe
+              </p>
+              <p className="text-sm text-[#8a8264] mb-4">Compréhension orale + production écrite</p>
+              <div className="flex justify-center mb-5">
+                <button
+                  onClick={() => speak(step.word?.arabic_vocalized)}
+                  className="w-16 h-16 rounded-full bg-ink text-gold-light flex items-center justify-center speak-pulse"
+                >
+                  <Volume2 size={28} />
+                </button>
+              </div>
+              {lastSpokenOk === false && (
+                <p className="text-sm text-center text-[#8a8264] mb-4">
+                  🔇 Pas de voix arabe disponible.
+                  <br />
+                  Prononciation phonétique : <em>{step.word?.transliteration}</em>
+                </p>
+              )}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!answered && !submitting) handleMcqSelect(typedAnswer, typedAnswer);
+                }}
+              >
+                <input
+                  type="text"
+                  dir="rtl"
+                  lang="ar"
+                  disabled={answered || submitting}
+                  value={typedAnswer}
+                  onChange={(e) => setTypedAnswer(e.target.value)}
+                  placeholder="اكتب هنا"
+                  className={`arabic text-2xl w-full border-2 rounded-xl px-4 py-3 mb-3 text-center ${
+                    answered && isCorrect ? "border-teal bg-teal/10" : answered ? "border-rust bg-rust/10" : "border-black/15"
+                  }`}
+                />
+                {answered && !isCorrect && (
+                  <p className="text-sm text-center text-[#8C3327] mb-2">
+                    Réponse attendue : <span className="arabic text-lg">{reveal?.value}</span>
+                  </p>
+                )}
+                {!answered && (
+                  <button
+                    type="submit"
+                    disabled={!typedAnswer.trim() || submitting}
+                    className="w-full bg-ink text-white font-bold py-3 rounded-xl disabled:opacity-40"
+                  >
+                    Vérifier
+                  </button>
+                )}
+              </form>
+            </>
+          )}
+
+          {step.kind === "repeat_aloud" && (
+            <>
+              <p className="font-semibold mb-1 flex items-center gap-2">
+                <Mic size={18} /> Production orale — lisez et répétez à voix haute
+              </p>
+              <p className="text-sm text-[#8a8264] mb-4">
+                Pas de reconnaissance vocale automatique pour l'instant — c'est vous qui jugez.
+              </p>
+              <div className="text-center py-3">
+                <div className="arabic text-5xl" dir="rtl">{step.word?.arabic_vocalized}</div>
+                <div className="italic text-[#6b6350] mt-2 text-base">{step.word?.transliteration}</div>
+                <div className="font-semibold mt-1">{step.word?.french}</div>
+              </div>
+              <div className="flex justify-center mb-5">
+                <button
+                  onClick={() => speak(step.word?.arabic_vocalized)}
+                  className="w-14 h-14 rounded-full bg-ink text-gold-light flex items-center justify-center speak-pulse"
+                >
+                  <Volume2 size={24} />
+                </button>
+              </div>
+              {!answered && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleMcqSelect(false, false)}
+                    className="flex-1 py-3 rounded-xl border-2 border-black/15 font-semibold text-sm"
+                  >
+                    À retravailler
+                  </button>
+                  <button
+                    onClick={() => handleMcqSelect(true, true)}
+                    className="flex-1 py-3 rounded-xl bg-teal text-white font-semibold text-sm"
+                  >
+                    J'ai réussi
+                  </button>
+                </div>
+              )}
             </>
           )}
 
