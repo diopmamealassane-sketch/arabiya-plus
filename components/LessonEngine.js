@@ -30,6 +30,8 @@ export default function LessonEngine({
   const [submitting, setSubmitting] = useState(false);
   const voicesRef = useRef([]);
 
+  const doneReportedRef = useRef(false);
+
   const done = stepIndex >= steps.length;
   const step = !done ? steps[stepIndex] : null;
 
@@ -167,6 +169,23 @@ export default function LessonEngine({
     note >= 12 ? "Assez bien." :
     note >= 10 ? "Passable." :
     "Peut mieux faire.";
+
+  // C'est CET appel qui marque réellement la leçon comme terminée — sans
+  // lui, la progression reste à zéro indéfiniment quel que soit l'effort
+  // réel de l'utilisateur. Protégé par une ref pour ne partir qu'une fois.
+  useEffect(() => {
+    if (!done || doneReportedRef.current) return;
+    doneReportedRef.current = true;
+    fetch("/api/complete-lesson", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ lesson_id: lessonId, accuracy: note * 5 }), // note/20 -> %/100
+    }).catch(() => {
+      // Si ça échoue (ex. hors-ligne), l'utilisateur garde son XP et son
+      // score affiché — seule la coche "terminée" du tableau de bord ne
+      // se mettra pas à jour cette fois, ce n'est pas bloquant.
+    });
+  }, [done]);
 
   if (done) {
     return (
