@@ -46,6 +46,24 @@ export default async function DashboardPage() {
   const completedLessons = (progress ?? []).filter((p) => p.status === "completed").length;
   const overallPct = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
+  // Calcule la prochaine leçon précise (pas juste l'unité) à proposer en
+  // priorité — c'est ce qui permet de "reprendre là où on s'était arrêté"
+  // dès la reconnexion, plutôt que de laisser l'utilisateur chercher.
+  let resumeLesson = null;
+  outer: for (const group of unitsByCycle) {
+    for (const unit of group.units) {
+      const locked = !unit.is_free && !isPremium;
+      if (locked) continue;
+      const sortedLessons = [...(unit.lessons ?? [])].sort((a, b) => a.order_index - b.order_index);
+      for (const lesson of sortedLessons) {
+        if (progressByLesson[lesson.id] !== "completed") {
+          resumeLesson = { ...lesson, unitTitle: unit.title_fr };
+          break outer;
+        }
+      }
+    }
+  }
+
   return (
     <main className="min-h-screen bg-parchment">
       {/* Bannière */}
@@ -92,6 +110,22 @@ export default async function DashboardPage() {
               Tarifs <ArrowRight size={16} />
             </Link>
           </div>
+        )}
+
+        {resumeLesson && completedLessons > 0 && (
+          <Link
+            href={`/lesson/${resumeLesson.id}`}
+            className="block bg-gradient-to-br from-ink to-ink-2 text-white rounded-2xl p-5 mb-6 shadow-md"
+          >
+            <p className="text-sm text-white/60 font-semibold mb-1">Reprendre où vous en étiez</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-gold-light font-bold uppercase tracking-wide">{resumeLesson.unitTitle}</p>
+                <p className="font-extrabold text-lg">{resumeLesson.title_fr}</p>
+              </div>
+              <ArrowRight size={22} className="text-gold-light shrink-0" />
+            </div>
+          </Link>
         )}
 
         {unitsByCycle.length > 0 ? (
