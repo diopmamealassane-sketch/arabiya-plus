@@ -126,6 +126,17 @@ export default async function LessonPage({ params }) {
           word: wordById[p.word_id],
           options: p.options,
         };
+      case "dictee":
+        // Écoute + écriture : le mot arabe (word.arabic_vocalized) ne doit
+        // JAMAIS s'afficher en texte côté client avant la réponse — il ne
+        // sert qu'à la synthèse vocale, exactement comme pour "listen".
+        return { id: s.id, kind: s.kind, word: wordById[p.word_id] };
+      case "repeat_aloud":
+        // Production orale : ici, au contraire, le mot s'affiche à l'écran
+        // (il faut le lire pour le répéter) — pas de triche possible
+        // puisqu'il n'y a pas de correction automatique, juste une
+        // auto-évaluation après avoir répété à voix haute.
+        return { id: s.id, kind: s.kind, word: wordById[p.word_id] };
       default:
         return { id: s.id, kind: s.kind };
     }
