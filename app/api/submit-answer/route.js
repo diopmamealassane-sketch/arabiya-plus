@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 import { nextBoxLevel, nextReviewDate } from "@/lib/srs";
 import { arabicAnswersMatch } from "@/lib/arabicNormalize";
+import { getWeekStartDate } from "@/lib/weekUtils";
 
 const XP_BY_KIND = {
   intro: 5,
@@ -50,12 +51,12 @@ export async function POST(request) {
   const isCorrect = evaluateAnswer(step, user_answer);
   const xpAwarded = isCorrect ? XP_BY_KIND[step.kind] ?? 10 : 0;
 
-  // 3. Update XP + streak.
+  // 3. Update XP + streak + XP hebdomadaire (pour le leaderboard).
   if (xpAwarded > 0) {
     const today = new Date().toISOString().slice(0, 10);
     const { data: stats } = await db
       .from("user_stats")
-      .select("xp_total, streak_count, last_active_date")
+      .select("xp_total, streak_count, last_active_date, weekly_xp, week_start_date")
       .eq("user_id", user.id)
       .single();
 
@@ -70,12 +71,28 @@ export async function POST(request) {
       ? (stats?.streak_count ?? 0) + 1
       : 1;
 
+    // L'XP hebdomadaire se remet à zéro dès qu'on détecte qu'on est
+    // entré dans une nouvelle semaine (comparaison du lundi courant à
+    // celui enregistré) — pas besoin de tâche planifiée (cron), la
+    // remise à zéro se fait "paresseusement" à la prochaine action.
+    const currentWeekStart = getWeekStartDate();
+    const isSameWeek = stats?.week_start_date === currentWeekStart;
+    const newWeeklyXp = isSameWeek ? (stats?.weekly_xp ?? 0) + xpAwarded : xpAwarded;
+
+    const displayName =
+      user.user_metadata?.full_name?.trim() ||
+      user.user_metadata?.name?.trim() ||
+      (user.email ? user.email.split("@")[0] : null);
+
     await db
       .from("user_stats")
       .update({
         xp_total: (stats?.xp_total ?? 0) + xpAwarded,
         streak_count: newStreak,
         last_active_date: today,
+        weekly_xp: newWeeklyXp,
+        week_start_date: currentWeekStart,
+        ...(displayName ? { display_name: displayName } : {}),
       })
       .eq("user_id", user.id);
   }
