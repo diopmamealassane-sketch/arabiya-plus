@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   Hand, Users, Hash, Palette, UtensilsCrossed, Clock, Home,
-  MessageCircle, BookOpen, Check, Lock, ChevronDown,
+  MessageCircle, BookOpen, Check, Lock, ChevronDown, Award,
 } from "lucide-react";
 
 const CYCLE_LABELS = {
@@ -129,6 +129,17 @@ export default function LearningPath({ unitsByCycle, progressByLesson, isPremium
                 {isOpen ? "−" : "+"}
               </span>
             </button>
+
+            {coreComplete && (
+              <div className="px-5 pb-4 -mt-1">
+                <a
+                  href={`/api/certificate?cycle=${group.cycle}`}
+                  className="inline-flex items-center gap-2 text-sm font-bold text-[#7a5c14] bg-gold/15 hover:bg-gold/25 transition-colors px-3 py-2 rounded-lg"
+                >
+                  <Award size={16} /> Télécharger votre certificat
+                </a>
+              </div>
+            )}
 
             {isOpen && (
               <div className="px-5 pb-8">
