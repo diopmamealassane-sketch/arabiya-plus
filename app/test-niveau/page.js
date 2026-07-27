@@ -1,89 +1,102 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowRight, RotateCcw, Sparkles, Check } from "lucide-react";
+import { ArrowRight, RotateCcw, Sparkles, Check, Lock, CheckCircle2, Target } from "lucide-react";
 import { arabicAnswersMatch } from "@/lib/arabicNormalize";
 
 // ------------------------------------------------------------------
-// Banque de vocabulaire — reprise mot pour mot du contenu réel des 40
-// leçons du cours (rien n'est inventé). ~110 entrées, réparties sur
-// toutes les unités du Cycle 1 et l'Unité 1 du Cycle 2, du plus simple
-// au plus avancé.
+// Banque de vocabulaire — 6 mots/expressions représentatifs par cycle,
+// tirés du contenu réel des 6 cycles du cours (A1 à C2). Chaque cycle
+// est maintenant réellement disponible, donc chaque niveau peut être
+// objectivement testé (plus d'estimation approximative au-delà de A2).
+// "typeable" = true pour les mots courts qu'on peut raisonnablement
+// demander de taper en arabe ; false pour les expressions plus longues,
+// testées uniquement en QCM.
 // ------------------------------------------------------------------
-const WORD_BANK = [
-  // Se saluer
-  { ar: "مَرْحَبًا", fr: "bonjour" }, { ar: "شُكْرًا", fr: "merci" },
-  { ar: "مَعَ السَّلَامَة", fr: "au revoir" }, { ar: "نَعَمْ", fr: "oui" }, { ar: "لَا", fr: "non" },
-  { ar: "مِنْ فَضْلِك", fr: "s'il te plaît" }, { ar: "عَفْوًا", fr: "de rien" },
-  { ar: "آسِف", fr: "désolé" }, { ar: "أَهْلًا وَسَهْلًا", fr: "bienvenue" },
-  { ar: "صَبَاحُ الخَيْر", fr: "bonjour (le matin)" }, { ar: "مَسَاءُ الخَيْر", fr: "bonsoir" },
-  { ar: "تُصْبِح عَلَى خَيْر", fr: "bonne nuit" }, { ar: "إِلَى اللِّقَاء", fr: "à bientôt" },
-  { ar: "مَبْرُوك", fr: "félicitations" }, { ar: "بِالتَّوْفِيق", fr: "bonne chance" },
-  { ar: "سَيِّد", fr: "monsieur" }, { ar: "سَيِّدَة", fr: "madame" }, { ar: "آنِسَة", fr: "mademoiselle" },
-  // La famille
-  { ar: "أَب", fr: "père" }, { ar: "أُم", fr: "mère" }, { ar: "اِبْن", fr: "fils" }, { ar: "اِبْنَة", fr: "fille" },
-  { ar: "أَخ", fr: "frère" }, { ar: "أُخْت", fr: "sœur" }, { ar: "جَدّ", fr: "grand-père" }, { ar: "جَدَّة", fr: "grand-mère" },
-  { ar: "عَمّ", fr: "oncle (paternel)" }, { ar: "عَمَّة", fr: "tante (paternelle)" },
-  { ar: "خَال", fr: "oncle (maternel)" }, { ar: "خَالَة", fr: "tante (maternelle)" },
-  { ar: "زَوْج", fr: "mari" }, { ar: "زَوْجَة", fr: "épouse" }, { ar: "طِفْل", fr: "enfant" }, { ar: "عَائِلَة", fr: "famille" },
-  { ar: "صَدِيق", fr: "ami" }, { ar: "صَدِيقَة", fr: "amie" }, { ar: "جَار", fr: "voisin" }, { ar: "جَارَة", fr: "voisine" },
-  // Les chiffres
-  { ar: "صِفْر", fr: "zéro" }, { ar: "وَاحِد", fr: "un" }, { ar: "اِثْنان", fr: "deux" }, { ar: "ثَلاثة", fr: "trois" },
-  { ar: "أَرْبَعة", fr: "quatre" }, { ar: "خَمْسة", fr: "cinq" }, { ar: "سِتَّة", fr: "six" }, { ar: "سَبْعَة", fr: "sept" },
-  { ar: "ثَمَانِيَة", fr: "huit" }, { ar: "تِسْعَة", fr: "neuf" }, { ar: "عَشَرَة", fr: "dix" },
-  { ar: "عِشْرُون", fr: "vingt" }, { ar: "ثَلاثُون", fr: "trente" }, { ar: "أَرْبَعُون", fr: "quarante" },
-  { ar: "خَمْسُون", fr: "cinquante" }, { ar: "سِتُّون", fr: "soixante" }, { ar: "مِئَة", fr: "cent" },
-  { ar: "أَوَّل", fr: "premier" }, { ar: "ثَانِي", fr: "deuxième" }, { ar: "ثَالِث", fr: "troisième" },
-  // Les couleurs
-  { ar: "أَحْمَر", fr: "rouge" }, { ar: "أَزْرَق", fr: "bleu" }, { ar: "أَخْضَر", fr: "vert" },
-  { ar: "أَصْفَر", fr: "jaune" }, { ar: "أَسْوَد", fr: "noir" }, { ar: "أَبْيَض", fr: "blanc" },
-  { ar: "بُنِّي", fr: "marron" }, { ar: "وَرْدِي", fr: "rose" }, { ar: "رَمَادِي", fr: "gris" },
-  { ar: "بُرْتُقَالِي", fr: "orange (couleur)" }, { ar: "بَنَفْسَجِي", fr: "violet" },
-  { ar: "فَاتِح", fr: "clair" }, { ar: "غَامِق", fr: "foncé" }, { ar: "ذَهَبِي", fr: "doré" },
-  // La nourriture
-  { ar: "خُبْز", fr: "pain" }, { ar: "مَاء", fr: "eau" }, { ar: "لَحْم", fr: "viande" },
-  { ar: "سَمَك", fr: "poisson" }, { ar: "فَاكِهَة", fr: "fruit" }, { ar: "خُضَار", fr: "légumes" },
-  { ar: "قَهْوَة", fr: "café" }, { ar: "شَاي", fr: "thé" }, { ar: "حَلِيب", fr: "lait" }, { ar: "عَصِير", fr: "jus" },
-  { ar: "فَطُور", fr: "petit-déjeuner" }, { ar: "غَدَاء", fr: "déjeuner" }, { ar: "عَشَاء", fr: "dîner" },
-  { ar: "تُفَّاح", fr: "pomme" }, { ar: "مَوْز", fr: "banane" }, { ar: "جَزَر", fr: "carotte" }, { ar: "بَصَل", fr: "oignon" },
-  // Le temps
-  { ar: "يَوْم", fr: "jour" }, { ar: "أُسْبُوع", fr: "semaine" }, { ar: "شَهْر", fr: "mois" }, { ar: "سَنَة", fr: "année" },
-  { ar: "صَبَاح", fr: "matin" }, { ar: "مَسَاء", fr: "soir" },
-  { ar: "الأَحَد", fr: "dimanche" }, { ar: "الإثْنَيْن", fr: "lundi" }, { ar: "الجُمُعَة", fr: "vendredi" }, { ar: "السَّبْت", fr: "samedi" },
-  { ar: "اليَوْم", fr: "aujourd'hui" }, { ar: "غَدًا", fr: "demain" }, { ar: "أَمْس", fr: "hier" },
-  { ar: "رَبِيع", fr: "printemps" }, { ar: "صَيْف", fr: "été" }, { ar: "خَرِيف", fr: "automne" }, { ar: "شِتَاء", fr: "hiver" },
-  // Les objets du quotidien
-  { ar: "كِتَاب", fr: "livre" }, { ar: "قَلَم", fr: "stylo" }, { ar: "بَاب", fr: "porte" },
-  { ar: "بَيْت", fr: "maison" }, { ar: "سَيَّارَة", fr: "voiture" }, { ar: "هَاتِف", fr: "téléphone" },
-  { ar: "قَمِيص", fr: "chemise" }, { ar: "حِذَاء", fr: "chaussure" }, { ar: "قُبَّعَة", fr: "chapeau" },
-  { ar: "طَاوِلَة", fr: "table" }, { ar: "مِفْتَاح", fr: "clé" }, { ar: "حَاسُوب", fr: "ordinateur" },
-  // Premières conversations
-  { ar: "مَا اسْمُكَ؟", fr: "comment tu t'appelles ?" }, { ar: "كَيْفَ حَالُكَ؟", fr: "comment vas-tu ?" },
-  { ar: "بِخَيْر", fr: "bien" }, { ar: "تَشَرَّفْنَا", fr: "enchanté(e)" }, { ar: "مِنْ أَيْنَ أَنْتَ؟", fr: "d'où viens-tu ?" },
-  { ar: "لا أَفْهَم", fr: "je ne comprends pas" }, { ar: "سَعِيد", fr: "content / heureux" },
-  { ar: "حَزِين", fr: "triste" }, { ar: "جَائِع", fr: "affamé" },
-  // Cycle 2 — Le présent
-  { ar: "أَنَا", fr: "je / moi" }, { ar: "أَنْتَ", fr: "tu (masculin)" }, { ar: "أَنْتِ", fr: "tu (féminin)" },
-  { ar: "هُوَ", fr: "il" }, { ar: "هِيَ", fr: "elle" }, { ar: "نَحْنُ", fr: "nous" },
-  { ar: "آكُل", fr: "je mange" }, { ar: "يَأْكُل", fr: "il mange" }, { ar: "نَأْكُل", fr: "nous mangeons" },
-];
+const WORD_BANK = {
+  A1: [
+    { ar: "مَرْحَبًا", fr: "bonjour", typeable: true },
+    { ar: "أَب", fr: "père", typeable: true },
+    { ar: "وَاحِد", fr: "un", typeable: true },
+    { ar: "أَحْمَر", fr: "rouge", typeable: true },
+    { ar: "خُبْز", fr: "pain", typeable: true },
+    { ar: "بَيْت", fr: "maison", typeable: true },
+  ],
+  A2: [
+    { ar: "أَنَا", fr: "je / moi", typeable: true },
+    { ar: "لِمَاذَا", fr: "pourquoi", typeable: true },
+    { ar: "مَطَار", fr: "aéroport", typeable: true },
+    { ar: "مَرِيض", fr: "malade", typeable: true },
+    { ar: "طَوِيل", fr: "grand (une personne)", typeable: true },
+    { ar: "إِنْتِرْنِت", fr: "internet", typeable: true },
+  ],
+  B1: [
+    { ar: "سَأَذْهَب غَدًا", fr: "j'irai demain", typeable: false },
+    { ar: "فِي رَأْيِي", fr: "à mon avis", typeable: false },
+    { ar: "لَوْ كُنْتُ غَنِيًّا", fr: "si j'étais riche", typeable: false },
+    { ar: "صَحَفِيّ", fr: "journaliste", typeable: true },
+    { ar: "مُقَابَلَة عَمَل", fr: "entretien d'embauche", typeable: false },
+    { ar: "وَاجِب مَنْزِلِيّ", fr: "devoir (à la maison)", typeable: false },
+  ],
+  B2: [
+    { ar: "كُتِبَ", fr: "a été écrit", typeable: true },
+    { ar: "قَالَ إِنَّهُ سَيَأْتِي", fr: "il a dit qu'il viendrait", typeable: false },
+    { ar: "الرَّجُل الَّذِي يَعْمَل هُنَا", fr: "l'homme qui travaille ici", typeable: false },
+    { ar: "بِالرَّغْم مِنْ ذَلِك", fr: "malgré cela", typeable: false },
+    { ar: "تَغَيُّر المُنَاخ", fr: "le changement climatique", typeable: false },
+    { ar: "الذَّكَاء الاِصْطِنَاعِيّ", fr: "l'intelligence artificielle", typeable: false },
+  ],
+  C1: [
+    { ar: "تَشَرَّفْنَا", fr: "enchanté (formel)", typeable: true },
+    { ar: "سُخْرِيَة", fr: "ironie", typeable: true },
+    { ar: "بِلَا أَدْنَى شَكّ", fr: "sans aucun doute", typeable: false },
+    { ar: "مُفَاوَضَات ثُنَائِيَّة", fr: "négociations bilatérales", typeable: false },
+    { ar: "اِسْتِعَارَة", fr: "métaphore", typeable: true },
+    { ar: "فَلْسَفَة", fr: "philosophie", typeable: true },
+  ],
+  C2: [
+    { ar: "لَهْجَة", fr: "dialecte", typeable: true },
+    { ar: "تَرْجَمَة فَوْرِيَّة", fr: "interprétation simultanée", typeable: false },
+    { ar: "حَكَوَاتِي", fr: "conteur traditionnel", typeable: true },
+    { ar: "جَذْر ثُلَاثِيّ", fr: "racine trilitère", typeable: false },
+    { ar: "صَحَافَة اِسْتِقْصَائِيَّة", fr: "journalisme d'investigation", typeable: false },
+    { ar: "البَلَاغَة", fr: "l'éloquence", typeable: true },
+  ],
+};
+
+const CYCLES = ["A1", "A2", "B1", "B2", "C1", "C2"];
+
+const CYCLE_LABELS = {
+  A1: "Cycle 1 — Débutant (A1)",
+  A2: "Cycle 2 — Élémentaire (A2)",
+  B1: "Cycle 3 — Intermédiaire (B1)",
+  B2: "Cycle 4 — Intermédiaire supérieur (B2)",
+  C1: "Cycle 5 — Avancé (C1)",
+  C2: "Cycle 6 — Expert (C2)",
+};
+
+const CYCLE_DESCRIPTIONS = {
+  A1: "Vous partez de zéro — parfait pour construire des bases solides.",
+  A2: "Les fondations sont là. Direction la grammaire et le quotidien.",
+  B1: "Vous savez déjà beaucoup de choses. Passons au passé, au futur et à l'opinion.",
+  B2: "Bon niveau intermédiaire. Il est temps d'attaquer les nuances et l'argumentation.",
+  C1: "Très bon niveau ! Direction les registres de langue et les sujets abstraits.",
+  C2: "Niveau avancé confirmé. Cap sur la maîtrise quasi native de l'arabe.",
+};
 
 // ------------------------------------------------------------------
-// Auto-évaluation (descripteurs CECRL) — nécessaire pour estimer B1 à
-// C2, contenu que le cours ne couvre pas encore objectivement.
+// Auto-évaluation — une question par cycle, pour recueillir le
+// ressenti personnel de l'utilisateur en complément du test objectif.
+// N'influence pas le calcul du niveau, affichée à titre indicatif.
 // ------------------------------------------------------------------
 const SELF_ASSESSMENT = [
-  "Je peux me présenter et saluer quelqu'un en arabe.",
-  "Je peux compter et donner des informations simples (âge, famille).",
-  "Je peux comprendre des phrases simples sur des sujets familiers (achats, travail).",
-  "Je peux raconter un événement passé ou décrire un projet simple.",
-  "Je peux tenir une conversation spontanée avec un locuteur natif sans trop d'effort.",
-  "Je peux comprendre un article de presse ou un bulletin d'actualités en arabe.",
-  "Je peux exprimer une opinion nuancée sur un sujet complexe.",
-  "Je peux comprendre un texte littéraire ou un discours formel sans difficulté.",
-  "Je peux m'exprimer spontanément et avec précision sur des sujets complexes.",
-  "Je me sens à l'aise à l'écrit comme à l'oral, à un niveau proche d'un natif.",
+  { cycle: "A1", prompt: "Je peux me présenter et saluer quelqu'un en arabe." },
+  { cycle: "A2", prompt: "Je peux parler de ma vie quotidienne et poser des questions simples." },
+  { cycle: "B1", prompt: "Je peux raconter un événement passé et donner mon avis." },
+  { cycle: "B2", prompt: "Je peux débattre d'un sujet d'actualité et nuancer mes propos." },
+  { cycle: "C1", prompt: "Je peux comprendre l'humour, l'ironie et un discours académique." },
+  { cycle: "C2", prompt: "Je me sens à l'aise à l'oral et à l'écrit, à un niveau proche d'un natif." },
 ];
 const SELF_OPTIONS = [
   { label: "Pas du tout", points: 0 },
@@ -91,6 +104,8 @@ const SELF_OPTIONS = [
   { label: "Assez bien", points: 2 },
   { label: "Tout à fait", points: 3 },
 ];
+
+const MASTERY_THRESHOLD = 0.65;
 
 function shuffle(arr) {
   const a = [...arr];
@@ -104,73 +119,99 @@ function sample(arr, n) {
   return shuffle(arr).slice(0, n);
 }
 
-// Construit dynamiquement 20 questions objectives (piochées au hasard
-// dans les ~110 mots, avec 3 types possibles dont la saisie tapée en
-// arabe) + les 10 questions d'auto-évaluation = 30 au total.
+// Construit le test : pour chaque cycle (A1 → C2, du plus facile au
+// plus dur), 6 questions objectives tirées du vrai vocabulaire du
+// cycle, puis les 6 questions d'auto-évaluation à la fin.
 function buildTest() {
-  const chosenWords = sample(WORD_BANK, 20);
-  const objective = chosenWords.map((w, i) => {
-    const kind = i % 3 === 0 ? "type_ar" : i % 3 === 1 ? "mcq_ar_to_fr" : "mcq_fr_to_ar";
-    const distractorPool = WORD_BANK.filter((x) => x.ar !== w.ar);
+  const objective = [];
+  CYCLES.forEach((cycle) => {
+    const words = shuffle(WORD_BANK[cycle]);
+    words.forEach((w, i) => {
+      const kindPool = w.typeable
+        ? ["type_ar", "mcq_ar_to_fr", "mcq_fr_to_ar"]
+        : ["mcq_ar_to_fr", "mcq_fr_to_ar"];
+      const kind = kindPool[i % kindPool.length];
+      const distractorPool = words.filter((x) => x.ar !== w.ar);
 
-    if (kind === "type_ar") {
-      return { kind, prompt: w.fr, answer: w.ar };
-    }
-    if (kind === "mcq_ar_to_fr") {
-      const distractors = sample(distractorPool, 3).map((d) => d.fr);
-      return { kind, prompt: w.ar, answer: w.fr, options: shuffle([w.fr, ...distractors]) };
-    }
-    // mcq_fr_to_ar
-    const distractors = sample(distractorPool, 3).map((d) => d.ar);
-    return { kind, prompt: w.fr, answer: w.ar, options: shuffle([w.ar, ...distractors]) };
+      if (kind === "type_ar") {
+        objective.push({ kind, cycle, prompt: w.fr, answer: w.ar });
+      } else if (kind === "mcq_ar_to_fr") {
+        const distractors = sample(distractorPool, Math.min(3, distractorPool.length)).map((d) => d.fr);
+        objective.push({ kind, cycle, prompt: w.ar, answer: w.fr, options: shuffle([w.fr, ...distractors]) });
+      } else {
+        const distractors = sample(distractorPool, Math.min(3, distractorPool.length)).map((d) => d.ar);
+        objective.push({ kind, cycle, prompt: w.fr, answer: w.ar, options: shuffle([w.ar, ...distractors]) });
+      }
+    });
   });
 
-  const self = shuffle(SELF_ASSESSMENT).map((prompt) => ({ kind: "self", prompt }));
+  const self = SELF_ASSESSMENT.map((item) => ({ kind: "self", cycle: item.cycle, prompt: item.prompt }));
 
   return [...objective, ...self];
 }
 
-function getRecommendation(score, maxScore) {
-  const pct = score / maxScore;
-  if (pct <= 0.18) {
-    return { level: "A1 — Débutant complet", unit: "Unité 1 — Se saluer",
-      description: "Parfait pour démarrer depuis le tout début.", available: true };
+// Détermine, à partir de la précision par cycle, le dernier cycle
+// réellement maîtrisé (≥ 65 % de bonnes réponses) en parcourant du
+// plus facile au plus dur. Le point de départ recommandé est le
+// cycle suivant — c'est la logique classique d'un test de placement :
+// trouver la limite exacte des connaissances acquises.
+function computeRecommendation(cycleStats) {
+  let confirmedIndex = -1;
+  for (let i = 0; i < CYCLES.length; i++) {
+    const stat = cycleStats[CYCLES[i]];
+    const pct = stat.total > 0 ? stat.correct / stat.total : 0;
+    if (pct >= MASTERY_THRESHOLD) confirmedIndex = i;
+    else break;
   }
-  if (pct <= 0.4) {
-    return { level: "A1 — Débutant confirmé", unit: "Unité 4 — Les couleurs",
-      description: "Les bases semblent déjà acquises. Reprenez à partir des couleurs.", available: true };
+
+  if (confirmedIndex === CYCLES.length - 1) {
+    return {
+      confirmedIndex,
+      startIndex: confirmedIndex,
+      level: "Expert (C2) — et au-delà !",
+      cycleLabel: CYCLE_LABELS.C2,
+      unit: "Unité 10 — L'éloquence et l'art du discours",
+      description:
+        "Vous maîtrisez l'ensemble du contenu testé, jusqu'au niveau C2. Votre niveau est proche d'une maîtrise quasi native — bravo !",
+      mastered: true,
+    };
   }
-  if (pct <= 0.62) {
-    return { level: "A2 — Élémentaire", unit: "Cycle 2, Unité 1 — Le présent",
-      description: "Le vocabulaire de base est acquis. Direction la grammaire.", available: true };
-  }
-  if (pct <= 0.8) {
-    return { level: "B1 — Intermédiaire (estimé)", unit: "Cycle 2, Unité 1 — Le présent",
-      description: "Votre niveau dépasse probablement le contenu actuel. Le Cycle 3 (B1) est en préparation.", available: false };
-  }
-  return { level: "B2 et au-delà (estimé)", unit: "Cycle 2, Unité 1 — Le présent",
-    description: "Niveau avancé estimé. Ce contenu n'est pas encore disponible — en attendant, vérifiez vos fondations sur le Cycle 2.", available: false };
+
+  const startIndex = confirmedIndex + 1;
+  const startCycle = CYCLES[startIndex];
+  return {
+    confirmedIndex,
+    startIndex,
+    level:
+      startIndex === 0
+        ? "Débutant complet (A1)"
+        : `${CYCLE_LABELS[startCycle].split("—")[1].trim()}`,
+    cycleLabel: CYCLE_LABELS[startCycle],
+    unit: "Unité 1",
+    description: CYCLE_DESCRIPTIONS[startCycle],
+    mastered: false,
+  };
 }
 
 export default function PlacementTestPage() {
   // Important : le tirage aléatoire ne doit JAMAIS se produire pendant le
   // rendu initial (serveur ou hydratation), sinon React détecte un
   // décalage entre ce que le serveur a généré et ce que le client
-  // recalcule — et le tirage ne serait alors fait qu'une fois, au moment
-  // de la construction du site, au lieu d'à chaque visite. On calcule
-  // donc les questions uniquement après le montage, côté navigateur.
+  // recalcule. On calcule donc les questions uniquement après le
+  // montage, côté navigateur.
   const [questions, setQuestions] = useState(null);
   useEffect(() => {
     setQuestions(buildTest());
   }, []);
 
   const [index, setIndex] = useState(0);
-  const [score, setScore] = useState(0);
+  const [cycleStats, setCycleStats] = useState(() =>
+    Object.fromEntries(CYCLES.map((c) => [c, { correct: 0, total: 0 }]))
+  );
+  const [selfStats, setSelfStats] = useState(() => Object.fromEntries(CYCLES.map((c) => [c, null])));
   const [selected, setSelected] = useState(null);
   const [typedAnswer, setTypedAnswer] = useState("");
   const [typedResult, setTypedResult] = useState(null); // null | true | false
-
-  const MAX_SCORE = 20 * 2 + 10 * 3; // 70
 
   if (!questions) {
     return (
@@ -182,26 +223,35 @@ export default function PlacementTestPage() {
 
   const done = index >= questions.length;
   const current = !done ? questions[index] : null;
+  const objectiveCount = CYCLES.length * 6;
 
-  function nextQuestion(gained) {
-    setScore((s) => s + gained);
+  function advance() {
     setSelected(null);
     setTypedAnswer("");
     setTypedResult(null);
     setIndex((i) => i + 1);
   }
 
+  function recordObjective(cycle, correct) {
+    setCycleStats((prev) => ({
+      ...prev,
+      [cycle]: { correct: prev[cycle].correct + (correct ? 1 : 0), total: prev[cycle].total + 1 },
+    }));
+  }
+
   function handleMcq(opt) {
     if (selected !== null) return;
     setSelected(opt);
     const correct = opt === current.answer;
-    setTimeout(() => nextQuestion(correct ? 2 : 0), 450);
+    recordObjective(current.cycle, correct);
+    setTimeout(advance, 450);
   }
 
   function handleSelf(opt) {
     if (selected !== null) return;
     setSelected(opt.label);
-    setTimeout(() => nextQuestion(opt.points), 300);
+    setSelfStats((prev) => ({ ...prev, [current.cycle]: opt.points }));
+    setTimeout(advance, 300);
   }
 
   function handleTypeSubmit(e) {
@@ -209,33 +259,69 @@ export default function PlacementTestPage() {
     if (typedResult !== null) return;
     const correct = arabicAnswersMatch(typedAnswer, current.answer);
     setTypedResult(correct);
-    setTimeout(() => nextQuestion(correct ? 2 : 0), 1100);
+    recordObjective(current.cycle, correct);
+    setTimeout(advance, 1100);
   }
 
   function restart() {
-    window.location.reload(); // régénère un nouveau tirage aléatoire de 30 questions
+    window.location.reload(); // régénère un nouveau tirage aléatoire
   }
 
   if (done) {
-    const reco = getRecommendation(score, MAX_SCORE);
+    const reco = computeRecommendation(cycleStats);
     return (
       <main className="geo-bg min-h-screen flex items-center justify-center px-4 py-12">
-        <div className="bg-parchment text-ink rounded-2xl p-8 max-w-sm w-full text-center float-in">
+        <div className="bg-parchment text-ink rounded-2xl p-8 max-w-md w-full text-center float-in">
           <Sparkles className="mx-auto mb-3 text-gold" size={30} />
           <p className="uppercase tracking-widest text-sm text-[#8a8264] font-semibold mb-2">Résultat de votre test</p>
           <h2 className="text-2xl font-bold mb-1">{reco.level}</h2>
           <p className="text-base text-[#6b6350] mb-5">{reco.description}</p>
+
           <div className="bg-white border-2 border-gold/40 rounded-xl p-4 mb-6">
             <p className="text-sm uppercase tracking-wide text-[#8a8264] font-semibold mb-1">
-              {reco.available ? "Point de départ recommandé" : "En attendant le contenu de votre niveau"}
+              {reco.mastered ? "Pour continuer à progresser" : "Point de départ recommandé"}
             </p>
-            <p className="font-bold">{reco.unit}</p>
+            <p className="font-bold">{reco.cycleLabel}</p>
+            <p className="text-sm text-[#6b6350]">{reco.unit}</p>
           </div>
-          <Link href="/signup" className="w-full bg-gradient-to-b from-gold-light to-gold text-[#241A02] font-bold py-3 rounded-xl flex items-center justify-center gap-2">
+
+          <div className="text-left mb-6">
+            <p className="text-sm uppercase tracking-wide text-[#8a8264] font-semibold mb-3">Votre parcours d'apprentissage</p>
+            <div className="space-y-2">
+              {CYCLES.map((cycle, i) => {
+                const isMastered = i <= reco.confirmedIndex;
+                const isStart = i === reco.startIndex && !reco.mastered;
+                const isStartMastered = reco.mastered && i === reco.startIndex;
+                let icon = <Lock size={16} className="text-black/25 shrink-0" />;
+                let cls = "text-black/35";
+                if (isMastered) {
+                  icon = <CheckCircle2 size={16} className="text-teal shrink-0" />;
+                  cls = "text-ink font-semibold";
+                }
+                if (isStart || isStartMastered) {
+                  icon = <Target size={16} className="text-gold shrink-0" />;
+                  cls = "text-ink font-bold";
+                }
+                return (
+                  <div key={cycle} className={`flex items-center gap-2.5 text-sm ${cls}`}>
+                    {icon}
+                    <span>{CYCLE_LABELS[cycle]}</span>
+                    {isMastered && !isStart && <span className="text-teal text-xs ml-auto">Maîtrisé</span>}
+                    {(isStart || isStartMastered) && <span className="text-[#8a8264] text-xs ml-auto">Point de départ</span>}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <Link
+            href="/signup"
+            className="w-full bg-gradient-to-b from-gold-light to-gold text-[#241A02] font-bold py-3 rounded-xl flex items-center justify-center gap-2"
+          >
             Commencer gratuitement <ArrowRight size={20} />
           </Link>
           <button onClick={restart} className="w-full mt-3 py-2 text-sm text-[#8a8264] flex items-center justify-center gap-1">
-            <RotateCcw size={14} /> Refaire le test (30 nouvelles questions)
+            <RotateCcw size={14} /> Refaire le test (nouveau tirage aléatoire)
           </button>
         </div>
       </main>
@@ -247,30 +333,45 @@ export default function PlacementTestPage() {
       <div className="max-w-sm mx-auto">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Link href="/"><img src="/logo-mark.png" alt="Arabiya+" className="h-12 w-auto" /></Link>
+            <Link href="/">
+              <img src="/logo-mark.png" alt="Arabiya+" className="h-12 w-auto" />
+            </Link>
             <span className="kufi text-base text-gold-light">Test de niveau</span>
           </div>
-          <span className="text-sm opacity-60">{index + 1} / {questions.length}</span>
+          <span className="text-sm opacity-60">
+            {index + 1} / {questions.length}
+          </span>
         </div>
 
         <div className="flex gap-1.5 mb-6">
           {questions.map((_, i) => (
             <div key={i} className="flex-1 h-2 rounded bg-white/10 overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-gold to-gold-light transition-transform duration-300"
-                style={{ transform: `scaleX(${i <= index ? 1 : 0})`, transformOrigin: "left" }} />
+              <div
+                className="h-full bg-gradient-to-r from-gold to-gold-light transition-transform duration-300"
+                style={{ transform: `scaleX(${i <= index ? 1 : 0})`, transformOrigin: "left" }}
+              />
             </div>
           ))}
         </div>
 
         <div className="bg-parchment text-ink rounded-2xl p-6 float-in">
-          {index === 20 && (
+          {index === 0 && (
             <p className="text-sm text-[#8a8264] italic mb-4">
-              Dernière partie — votre aisance générale, pour affiner l'estimation au-delà du contenu testable.
+              Le test commence par les bases (A1) et devient progressivement plus difficile, jusqu'au niveau C2.
+            </p>
+          )}
+          {index === objectiveCount && (
+            <p className="text-sm text-[#8a8264] italic mb-4">
+              Dernière partie — votre ressenti personnel, à titre indicatif.
             </p>
           )}
 
           <p
-            className={current.kind !== "self" && /[\u0600-\u06FF]/.test(current.prompt) ? "arabic text-3xl text-center mb-5" : "font-semibold mb-5 text-base"}
+            className={
+              current.kind !== "self" && /[\u0600-\u06FF]/.test(current.prompt)
+                ? "arabic text-3xl text-center mb-5"
+                : "font-semibold mb-5 text-base"
+            }
             dir={current.kind !== "self" && /[\u0600-\u06FF]/.test(current.prompt) ? "rtl" : undefined}
           >
             {current.prompt}
@@ -321,9 +422,19 @@ export default function PlacementTestPage() {
                 if (isRight) cls = "border-teal bg-teal/10 text-[#1E5E56]";
                 else if (isWrong) cls = "border-rust bg-rust/10 text-[#8C3327]";
                 return (
-                  <button key={opt} onClick={() => handleMcq(opt)} disabled={selected !== null}
-                    className={`text-left px-4 py-3 rounded-xl border-2 font-semibold text-base ${cls}`}>
-                    {isArabic ? <span className="arabic text-xl" dir="rtl">{opt}</span> : opt}
+                  <button
+                    key={opt}
+                    onClick={() => handleMcq(opt)}
+                    disabled={selected !== null}
+                    className={`text-left px-4 py-3 rounded-xl border-2 font-semibold text-base ${cls}`}
+                  >
+                    {isArabic ? (
+                      <span className="arabic text-xl" dir="rtl">
+                        {opt}
+                      </span>
+                    ) : (
+                      opt
+                    )}
                   </button>
                 );
               })}
@@ -333,10 +444,14 @@ export default function PlacementTestPage() {
           {current.kind === "self" && (
             <div className="flex flex-col gap-2">
               {SELF_OPTIONS.map((opt) => (
-                <button key={opt.label} onClick={() => handleSelf(opt)} disabled={selected !== null}
+                <button
+                  key={opt.label}
+                  onClick={() => handleSelf(opt)}
+                  disabled={selected !== null}
                   className={`text-left px-4 py-3 rounded-xl border-2 font-semibold text-base ${
                     selected === opt.label ? "border-ink-3 bg-black/5" : "border-black/10 bg-white"
-                  }`}>
+                  }`}
+                >
                   {opt.label}
                 </button>
               ))}
@@ -345,7 +460,7 @@ export default function PlacementTestPage() {
         </div>
 
         <p className="text-center text-sm text-parchment-dim opacity-60 mt-6">
-          Gratuit, sans inscription — 30 questions tirées au hasard parmi plus de 100, à chaque tentative.
+          Gratuit, sans inscription — {objectiveCount} questions couvrant les 6 niveaux du CECRL, du A1 au C2.
         </p>
       </div>
     </main>
