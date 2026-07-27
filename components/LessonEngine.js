@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Volume2, X, Check, ArrowRight, ArrowLeft, RotateCcw, CheckCircle2, Mic, PenLine } from "lucide-react";
+import { Volume2, X, Check, ArrowRight, ArrowLeft, RotateCcw, CheckCircle2, Mic, PenLine, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { scorePronunciation } from "@/lib/pronunciationScore";
 
 export default function LessonEngine({
   lessonTitle,
@@ -29,7 +30,11 @@ export default function LessonEngine({
   const [lastSpokenOk, setLastSpokenOk] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [typedAnswer, setTypedAnswer] = useState("");
+  const [recognitionState, setRecognitionState] = useState("idle"); // idle | listening | unsupported
+  const [pronunciationScore, setPronunciationScore] = useState(null);
+  const [cultureBite, setCultureBite] = useState(null);
   const voicesRef = useRef([]);
+  const recognitionRef = useRef(null);
 
   const doneReportedRef = useRef(false);
 
@@ -58,6 +63,9 @@ export default function LessonEngine({
     setReveal(null);
     setOrderChosen([]);
     setTypedAnswer("");
+    setPronunciationScore(null);
+    setRecognitionState((s) => (s === "unsupported" ? s : "idle"));
+    recognitionRef.current?.abort?.();
   }, [stepIndex]);
 
   useEffect(() => {
@@ -96,6 +104,47 @@ export default function LessonEngine({
       window.speechSynthesis.speak(utter);
     } catch {
       setLastSpokenOk(false);
+    }
+  }
+
+  // Reconnaissance vocale du navigateur pour l'étape "répéter à voix
+  // haute" : on écoute ce que l'utilisateur prononce, on compare au mot
+  // attendu (tolérant aux harakat comme la dictée) et on note sur 100.
+  // Non disponible partout (Chrome/Edge oui, Firefox/Safari non) — dans
+  // ce cas on retombe simplement sur l'auto-évaluation manuelle
+  // existante, qui reste toujours affichée en complément.
+  function startPronunciationCheck(targetWord) {
+    const SpeechRecognitionCtor =
+      typeof window !== "undefined" && (window.SpeechRecognition || window.webkitSpeechRecognition);
+
+    if (!SpeechRecognitionCtor) {
+      setRecognitionState("unsupported");
+      return;
+    }
+
+    const recognition = new SpeechRecognitionCtor();
+    recognition.lang = "ar-SA";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognitionRef.current = recognition;
+
+    recognition.onstart = () => setRecognitionState("listening");
+    recognition.onerror = () => setRecognitionState("idle");
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      const score = scorePronunciation(transcript, targetWord);
+      setPronunciationScore(score);
+      setRecognitionState("idle");
+      handleMcqSelect(score >= 60, score >= 60);
+    };
+    recognition.onend = () => {
+      setRecognitionState((s) => (s === "listening" ? "idle" : s));
+    };
+
+    try {
+      recognition.start();
+    } catch {
+      setRecognitionState("idle");
     }
   }
 
@@ -189,6 +238,19 @@ export default function LessonEngine({
     });
   }, [done]);
 
+  // Capsule culturelle affichée sur l'écran de fin de leçon — purement
+  // décorative, donc un échec réseau ne doit jamais bloquer l'écran de
+  // résultat : on l'ignore silencieusement le cas échéant.
+  useEffect(() => {
+    if (!done) return;
+    fetch("/api/culture-bite/random")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data && !data.error) setCultureBite(data);
+      })
+      .catch(() => {});
+  }, [done]);
+
   if (done) {
     return (
       <main className="geo-bg min-h-screen flex items-center justify-center px-4">
@@ -206,6 +268,18 @@ export default function LessonEngine({
           <p className="text-sm text-[#8a8264] mb-6">
             {correctCount} / {gradedCount} bonnes réponses · +{xpEarned} XP
           </p>
+
+          {cultureBite && (
+            <div className="bg-white border-2 border-gold/30 rounded-xl p-4 mb-6 text-left">
+              <p className="text-xs uppercase tracking-wide text-[#8a8264] font-bold mb-1.5 flex items-center gap-1.5">
+                <Sparkles size={13} className="text-gold" /> Le saviez-vous ?
+              </p>
+              <p className="font-bold text-ink mb-1">
+                {cultureBite.emoji} {cultureBite.title_fr}
+              </p>
+              <p className="text-sm text-[#6b6350]">{cultureBite.body_fr}</p>
+            </div>
+          )}
 
           <button
             onClick={() => (nextLessonId ? router.push(`/lesson/${nextLessonId}`) : router.push("/dashboard"))}
@@ -492,21 +566,59 @@ export default function LessonEngine({
                 <Mic size={18} /> Production orale — lisez et répétez à voix haute
               </p>
               <p className="text-sm text-[#8a8264] mb-4">
-                Pas de reconnaissance vocale automatique pour l'instant — c'est vous qui jugez.
+                {recognitionState === "unsupported"
+                  ? "Reconnaissance vocale non disponible sur ce navigateur — évaluez-vous vous-même ci-dessous."
+                  : "Enregistrez-vous, ou évaluez-vous vous-même."}
               </p>
               <div className="text-center py-3">
                 <div className="arabic text-5xl" dir="rtl">{step.word?.arabic_vocalized}</div>
                 <div className="italic text-[#6b6350] mt-2 text-base">{step.word?.transliteration}</div>
                 <div className="font-semibold mt-1">{step.word?.french}</div>
               </div>
-              <div className="flex justify-center mb-5">
+              <div className="flex justify-center gap-4 mb-5">
                 <button
                   onClick={() => speak(step.word?.arabic_vocalized)}
                   className="w-14 h-14 rounded-full bg-ink text-gold-light flex items-center justify-center speak-pulse"
+                  title="Écouter la prononciation"
                 >
                   <Volume2 size={24} />
                 </button>
+                {recognitionState !== "unsupported" && !answered && (
+                  <button
+                    onClick={() => startPronunciationCheck(step.word?.arabic_vocalized)}
+                    disabled={recognitionState === "listening" || submitting}
+                    className={`w-14 h-14 rounded-full flex items-center justify-center ${
+                      recognitionState === "listening"
+                        ? "bg-rust text-white speak-pulse"
+                        : "bg-teal text-white"
+                    }`}
+                    title="Enregistrer ma prononciation"
+                  >
+                    <Mic size={24} />
+                  </button>
+                )}
               </div>
+
+              {recognitionState === "listening" && (
+                <p className="text-sm text-center text-[#7a5c14] font-semibold mb-4">
+                  🎙️ Je vous écoute — parlez maintenant…
+                </p>
+              )}
+
+              {pronunciationScore !== null && (
+                <div
+                  className={`rounded-xl px-4 py-3 mb-4 text-center font-bold ${
+                    pronunciationScore >= 80
+                      ? "bg-teal/10 text-[#1E5E56]"
+                      : pronunciationScore >= 60
+                      ? "bg-gold/15 text-[#7a5c14]"
+                      : "bg-rust/10 text-[#8C3327]"
+                  }`}
+                >
+                  Score de prononciation : {pronunciationScore}%
+                </div>
+              )}
+
               {!answered && (
                 <div className="flex gap-2">
                   <button
