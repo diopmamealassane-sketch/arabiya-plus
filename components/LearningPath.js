@@ -37,8 +37,10 @@ export default function LearningPath({ unitsByCycle, progressByLesson, isPremium
 
   // Trouve la première unité déverrouillée et non-terminée, tous cycles
   // confondus dans l'ordre d'affichage — c'est elle qui reçoit le badge "or"
-  // et l'étiquette "Continuer ici".
+  // et l'étiquette "Continuer ici". Le cycle qui la contient est celui
+  // ouvert par défaut ci-dessous.
   let currentUnitId = null;
+  let currentCycle = null;
   outer: for (const group of unitsByCycle) {
     for (const unit of group.units) {
       const locked = !unit.is_free && !isPremium;
@@ -48,108 +50,153 @@ export default function LearningPath({ unitsByCycle, progressByLesson, isPremium
       ).length;
       if (!locked && doneCount < total) {
         currentUnitId = unit.id;
+        currentCycle = group.cycle;
         break outer;
       }
     }
   }
 
+  // Un seul cycle ouvert à la fois, replié par défaut sauf celui du
+  // "Continuer ici" — évite une page interminable quand il y a beaucoup
+  // de cycles.
+  const [openCycle, setOpenCycle] = useState(
+    currentCycle ?? unitsByCycle[0]?.cycle ?? null
+  );
+
   return (
-    <div className="space-y-12">
-      {unitsByCycle.map((group) => (
-        <section key={group.cycle}>
-          <div className="flex items-center gap-3 mb-6">
-            <span className="bg-gold text-[#2A1F04] text-xs font-black uppercase tracking-wide px-3 py-1 rounded-full">
-              {group.cycle}
-            </span>
-            <h2 className="text-ink/60 font-extrabold text-base">
-              {CYCLE_LABELS[group.cycle] ?? group.cycle}
-            </h2>
-          </div>
+    <div className="space-y-4">
+      {unitsByCycle.map((group) => {
+        const isOpen = openCycle === group.cycle;
+        const cycleTotal = group.units.reduce(
+          (sum, u) => sum + (u.lessons?.length ?? 0),
+          0
+        );
+        const cycleDone = group.units.reduce(
+          (sum, u) =>
+            sum +
+            (u.lessons ?? []).filter((l) => progressByLesson[l.id] === "completed").length,
+          0
+        );
+        const cycleComplete = cycleTotal > 0 && cycleDone === cycleTotal;
 
-          <div className="relative pt-8">
-            <div className="absolute left-1/2 top-10 bottom-2 -translate-x-1/2 border-l-2 border-dashed border-gold/40" />
-            <div className="relative space-y-8">
-              {group.units.map((unit, i) => {
-                const Icon = unitIcon(unit.title_fr);
-                const locked = !unit.is_free && !isPremium;
-                const total = unit.lessons?.length ?? 0;
-                const doneCount = (unit.lessons ?? []).filter(
-                  (l) => progressByLesson[l.id] === "completed"
-                ).length;
-                const isDone = total > 0 && doneCount === total;
-                const isCurrent = unit.id === currentUnitId;
-                const expanded = expandedUnitId === unit.id;
-                const align = i % 2 === 0 ? "justify-start" : "justify-end";
+        return (
+          <section
+            key={group.cycle}
+            className="bg-white rounded-2xl shadow-sm border border-gold/15 overflow-hidden"
+          >
+            <button
+              onClick={() => setOpenCycle(isOpen ? null : group.cycle)}
+              className="w-full flex items-center gap-3 px-5 py-4 text-left"
+            >
+              <span className="bg-gold text-[#2A1F04] text-xs font-black uppercase tracking-wide px-3 py-1 rounded-full shrink-0">
+                {group.cycle}
+              </span>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-ink/60 font-extrabold text-base truncate">
+                  {CYCLE_LABELS[group.cycle] ?? group.cycle}
+                </h2>
+                <p className="text-xs font-bold text-ink/40 mt-0.5">
+                  {cycleComplete ? "✓ Terminé" : `${cycleDone} / ${cycleTotal} leçons`}
+                </p>
+              </div>
+              <span
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-lg font-black shrink-0 transition-colors ${
+                  isOpen ? "bg-ink text-white" : "bg-gold/20 text-[#7a5c14]"
+                }`}
+              >
+                {isOpen ? "−" : "+"}
+              </span>
+            </button>
 
-                let circleCls = "bg-white border-4 border-ink/15 text-ink";
-                if (locked) circleCls = "bg-gray-200 border-4 border-white text-gray-400";
-                else if (isDone) circleCls = "bg-ink border-4 border-white text-white";
-                else if (isCurrent) circleCls = "bg-gold border-4 border-white text-[#2A1F04]";
+            {isOpen && (
+              <div className="px-5 pb-8">
+                <div className="relative pt-8">
+                  <div className="absolute left-1/2 top-10 bottom-2 -translate-x-1/2 border-l-2 border-dashed border-gold/40" />
+                  <div className="relative space-y-8">
+                    {group.units.map((unit, i) => {
+                      const Icon = unitIcon(unit.title_fr);
+                      const locked = !unit.is_free && !isPremium;
+                      const total = unit.lessons?.length ?? 0;
+                      const doneCount = (unit.lessons ?? []).filter(
+                        (l) => progressByLesson[l.id] === "completed"
+                      ).length;
+                      const isDone = total > 0 && doneCount === total;
+                      const isCurrent = unit.id === currentUnitId;
+                      const expanded = expandedUnitId === unit.id;
+                      const align = i % 2 === 0 ? "justify-start" : "justify-end";
 
-                return (
-                  <div key={unit.id}>
-                    <div className={`flex ${align}`}>
-                      <div className="w-40 flex flex-col items-center text-center relative">
-                        {isCurrent && (
-                          <span className="absolute -top-7 bg-ink text-white text-xs font-extrabold px-2.5 py-1 rounded-lg whitespace-nowrap">
-                            Continuer ici
-                          </span>
-                        )}
-                        <button
-                          onClick={() => !locked && setExpandedUnitId(expanded ? null : unit.id)}
-                          disabled={locked}
-                          className={`w-[72px] h-[72px] rounded-full flex items-center justify-center shadow-lg transition-transform active:scale-95 ${circleCls}`}
-                        >
-                          {locked ? <Lock size={28} /> : isDone ? <Check size={32} /> : <Icon size={30} />}
-                        </button>
-                        <p className="mt-2.5 font-extrabold text-base text-ink leading-tight">
-                          {unit.title_fr}
-                        </p>
-                        <p className="text-xs font-bold text-ink/45 mt-0.5">
-                          {locked ? "Premium" : `${doneCount} / ${total} leçons`}
-                        </p>
-                      </div>
-                    </div>
+                      let circleCls = "bg-white border-4 border-ink/15 text-ink";
+                      if (locked) circleCls = "bg-gray-200 border-4 border-white text-gray-400";
+                      else if (isDone) circleCls = "bg-ink border-4 border-white text-white";
+                      else if (isCurrent) circleCls = "bg-gold border-4 border-white text-[#2A1F04]";
 
-                    {expanded && !locked && (
-                      <div className="mt-4 bg-white rounded-2xl p-5 shadow-md border border-gold/20 float-in">
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="w-10 h-10 rounded-xl bg-ink/5 flex items-center justify-center">
-                            <Icon size={22} className="text-ink" />
+                      return (
+                        <div key={unit.id}>
+                          <div className={`flex ${align}`}>
+                            <div className="w-40 flex flex-col items-center text-center relative">
+                              {isCurrent && (
+                                <span className="absolute -top-7 bg-ink text-white text-xs font-extrabold px-2.5 py-1 rounded-lg whitespace-nowrap">
+                                  Continuer ici
+                                </span>
+                              )}
+                              <button
+                                onClick={() => !locked && setExpandedUnitId(expanded ? null : unit.id)}
+                                disabled={locked}
+                                className={`w-[72px] h-[72px] rounded-full flex items-center justify-center shadow-lg transition-transform active:scale-95 ${circleCls}`}
+                              >
+                                {locked ? <Lock size={28} /> : isDone ? <Check size={32} /> : <Icon size={30} />}
+                              </button>
+                              <p className="mt-2.5 font-extrabold text-base text-ink leading-tight">
+                                {unit.title_fr}
+                              </p>
+                              <p className="text-xs font-bold text-ink/45 mt-0.5">
+                                {locked ? "Premium" : `${doneCount} / ${total} leçons`}
+                              </p>
+                            </div>
                           </div>
-                          <h3 className="font-extrabold text-ink">{unit.title_fr}</h3>
-                          <ChevronDown size={18} className="text-ink/30 ml-auto" />
+
+                          {expanded && !locked && (
+                            <div className="mt-4 bg-white rounded-2xl p-5 shadow-md border border-gold/20 float-in">
+                              <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 rounded-xl bg-ink/5 flex items-center justify-center">
+                                  <Icon size={22} className="text-ink" />
+                                </div>
+                                <h3 className="font-extrabold text-ink">{unit.title_fr}</h3>
+                                <ChevronDown size={18} className="text-ink/30 ml-auto" />
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                {(unit.lessons ?? [])
+                                  .sort((a, b) => a.order_index - b.order_index)
+                                  .map((lesson) => {
+                                    const status = progressByLesson[lesson.id] ?? "not_started";
+                                    const cls =
+                                      status === "completed"
+                                        ? "bg-ink/10 text-ink"
+                                        : "bg-gold/20 text-[#7a5c14]";
+                                    return (
+                                      <Link
+                                        key={lesson.id}
+                                        href={`/lesson/${lesson.id}`}
+                                        className={`text-sm px-3 py-2 rounded-xl font-bold ${cls}`}
+                                      >
+                                        {status === "completed" ? "✓ " : ""}
+                                        {lesson.title_fr}
+                                      </Link>
+                                    );
+                                  })}
+                              </div>
+                            </div>
+                          )}
                         </div>
-                        <div className="flex flex-wrap gap-2">
-                          {(unit.lessons ?? [])
-                            .sort((a, b) => a.order_index - b.order_index)
-                            .map((lesson) => {
-                              const status = progressByLesson[lesson.id] ?? "not_started";
-                              const cls =
-                                status === "completed"
-                                  ? "bg-ink/10 text-ink"
-                                  : "bg-gold/20 text-[#7a5c14]";
-                              return (
-                                <Link
-                                  key={lesson.id}
-                                  href={`/lesson/${lesson.id}`}
-                                  className={`text-sm px-3 py-2 rounded-xl font-bold ${cls}`}
-                                >
-                                  {status === "completed" ? "✓ " : ""}
-                                  {lesson.title_fr}
-                                </Link>
-                              );
-                            })}
-                        </div>
-                      </div>
-                    )}
+                      );
+                    })}
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      ))}
+                </div>
+              </div>
+            )}
+          </section>
+        );
+      })}
     </div>
   );
 }
