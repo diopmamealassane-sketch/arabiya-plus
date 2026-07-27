@@ -40,6 +40,16 @@ export default function ReviewSession({ words }) {
   function playAudio() {
     if (word?.audio_url) {
       new Audio(word.audio_url).play().catch(() => {});
+      return;
+    }
+    // Pas de fichier audio enregistré pour ce mot — on utilise la synthèse
+    // vocale du navigateur pour lire l'arabe à voix haute (gratuit, aucun
+    // fichier à héberger).
+    if (typeof window !== "undefined" && window.speechSynthesis && word?.arabic_vocalized) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(word.arabic_vocalized);
+      utterance.lang = "ar-SA";
+      window.speechSynthesis.speak(utterance);
     }
   }
 
