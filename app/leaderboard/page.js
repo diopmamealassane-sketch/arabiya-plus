@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft, Trophy, Medal } from "lucide-react";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createServerSupabaseClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { getWeekStartDate } from "@/lib/weekUtils";
 
 export const dynamic = "force-dynamic";
 
 export default async function LeaderboardPage() {
+  // Client "session" : sert uniquement à vérifier qui est connecté.
   const supabase = createServerSupabaseClient();
   const {
     data: { user },
@@ -14,9 +15,15 @@ export default async function LeaderboardPage() {
 
   if (!user) redirect("/login");
 
+  // Client "service role" : contourne la RLS pour pouvoir lire les
+  // lignes de TOUS les utilisateurs — indispensable pour un classement.
+  // Sans lui, la RLS de user_stats limite chacun à sa propre ligne, et
+  // le classement n'affiche jamais que "1 participant : soi-même".
+  const db = createServiceRoleClient();
+
   const weekStart = getWeekStartDate();
 
-  const { data: rows } = await supabase
+  const { data: rows } = await db
     .from("user_stats")
     .select("user_id, display_name, weekly_xp, week_start_date")
     .eq("week_start_date", weekStart)
@@ -95,4 +102,3 @@ export default async function LeaderboardPage() {
     </main>
   );
 }
-
