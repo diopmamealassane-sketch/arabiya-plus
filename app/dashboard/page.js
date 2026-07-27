@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Flame, Star, ArrowRight } from "lucide-react";
+import { Flame, Star, ArrowRight, Brain } from "lucide-react";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import LearningPath from "@/components/LearningPath";
 
@@ -14,17 +14,29 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/login");
 
-  const [{ data: stats }, { data: units }, { data: progress }, { data: subscription }] =
-    await Promise.all([
-      supabase.from("user_stats").select("*").eq("user_id", user.id).single(),
-      supabase
-        .from("units")
-        .select("id, cycle, title_fr, order_index, is_free, lessons(id, title_fr, order_index)")
-        .order("cycle")
-        .order("order_index"),
-      supabase.from("user_progress").select("lesson_id, status").eq("user_id", user.id),
-      supabase.from("subscriptions").select("status").eq("user_id", user.id).single(),
-    ]);
+  const nowIso = new Date().toISOString();
+
+  const [
+    { data: stats },
+    { data: units },
+    { data: progress },
+    { data: subscription },
+    { count: dueReviewCount },
+  ] = await Promise.all([
+    supabase.from("user_stats").select("*").eq("user_id", user.id).single(),
+    supabase
+      .from("units")
+      .select("id, cycle, title_fr, order_index, is_free, lessons(id, title_fr, order_index)")
+      .order("cycle")
+      .order("order_index"),
+    supabase.from("user_progress").select("lesson_id, status").eq("user_id", user.id),
+    supabase.from("subscriptions").select("status").eq("user_id", user.id).single(),
+    supabase
+      .from("user_word_review")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .lte("next_review_at", nowIso),
+  ]);
 
   const progressByLesson = Object.fromEntries(
     (progress ?? []).map((p) => [p.lesson_id, p.status])
@@ -63,6 +75,8 @@ export default async function DashboardPage() {
       }
     }
   }
+
+  const dueCount = dueReviewCount ?? 0;
 
   return (
     <main className="min-h-screen bg-parchment">
@@ -112,21 +126,45 @@ export default async function DashboardPage() {
           </div>
         )}
 
-        {resumeLesson && completedLessons > 0 && (
-          <Link
-            href={`/lesson/${resumeLesson.id}`}
-            className="block bg-gradient-to-br from-ink to-ink-2 text-white rounded-2xl p-5 mb-6 shadow-md"
-          >
-            <p className="text-sm text-white/60 font-semibold mb-1">Reprendre où vous en étiez</p>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-gold-light font-bold uppercase tracking-wide">{resumeLesson.unitTitle}</p>
-                <p className="font-extrabold text-lg">{resumeLesson.title_fr}</p>
+        <div className="grid gap-4 mb-6">
+          {resumeLesson && completedLessons > 0 && (
+            <Link
+              href={`/lesson/${resumeLesson.id}`}
+              className="block bg-gradient-to-br from-ink to-ink-2 text-white rounded-2xl p-5 shadow-md"
+            >
+              <p className="text-sm text-white/60 font-semibold mb-1">Reprendre où vous en étiez</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-gold-light font-bold uppercase tracking-wide">{resumeLesson.unitTitle}</p>
+                  <p className="font-extrabold text-lg">{resumeLesson.title_fr}</p>
+                </div>
+                <ArrowRight size={22} className="text-gold-light shrink-0" />
               </div>
-              <ArrowRight size={22} className="text-gold-light shrink-0" />
-            </div>
-          </Link>
-        )}
+            </Link>
+          )}
+
+          {dueCount > 0 && (
+            <Link
+              href="/review"
+              className="block bg-gradient-to-br from-gold-light to-gold text-[#241A02] rounded-2xl p-5 shadow-md"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-xl bg-black/10 flex items-center justify-center shrink-0">
+                    <Brain size={22} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold opacity-70">Révision du jour</p>
+                    <p className="font-extrabold text-lg">
+                      {dueCount} mot{dueCount !== 1 ? "s" : ""} à réviser
+                    </p>
+                  </div>
+                </div>
+                <ArrowRight size={22} className="shrink-0" />
+              </div>
+            </Link>
+          )}
+        </div>
 
         {unitsByCycle.length > 0 ? (
           <LearningPath
