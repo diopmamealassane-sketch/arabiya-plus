@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Flame, Star, ArrowRight, Brain } from "lucide-react";
+import { Flame, Star, ArrowRight, Brain, Trophy } from "lucide-react";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import LearningPath from "@/components/LearningPath";
 
@@ -93,6 +93,12 @@ export default async function DashboardPage() {
             <span className="bg-white/15 backdrop-blur rounded-full px-3.5 py-1.5 text-sm font-extrabold flex items-center gap-1.5">
               <Star size={16} /> {stats?.xp_total ?? 0} XP
             </span>
+            <Link
+              href="/leaderboard"
+              className="bg-white/15 backdrop-blur rounded-full px-3.5 py-1.5 text-sm font-extrabold flex items-center gap-1.5"
+            >
+              <Trophy size={16} />
+            </Link>
           </div>
         </div>
 
