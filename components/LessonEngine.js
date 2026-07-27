@@ -240,10 +240,12 @@ export default function LessonEngine({
 
   // Capsule culturelle affichée sur l'écran de fin de leçon — purement
   // décorative, donc un échec réseau ne doit jamais bloquer l'écran de
-  // résultat : on l'ignore silencieusement le cas échéant.
+  // résultat : on l'ignore silencieusement le cas échéant. cache: "no-store"
+  // empêche le navigateur de réutiliser une réponse précédente au lieu
+  // d'aller retirer une nouvelle capsule au hasard côté serveur.
   useEffect(() => {
     if (!done) return;
-    fetch("/api/culture-bite/random")
+    fetch("/api/culture-bite/random", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (data && !data.error) setCultureBite(data);
