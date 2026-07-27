@@ -42,8 +42,17 @@ export default function LearningPath({ unitsByCycle, progressByLesson, isPremium
   let currentUnitId = null;
   let currentCycle = null;
   outer: for (const group of unitsByCycle) {
+    const coreUnitsForGroup = group.units.filter((u) => u.order_index <= 10);
+    const coreTotalForGroup = coreUnitsForGroup.reduce((sum, u) => sum + (u.lessons?.length ?? 0), 0);
+    const coreDoneForGroup = coreUnitsForGroup.reduce(
+      (sum, u) => sum + (u.lessons ?? []).filter((l) => progressByLesson[l.id] === "completed").length,
+      0
+    );
+    const coreCompleteForGroup = coreTotalForGroup > 0 && coreDoneForGroup === coreTotalForGroup;
+
     for (const unit of group.units) {
-      const locked = !unit.is_free && !isPremium;
+      const isExamUnit = unit.order_index > 10;
+      const locked = (!unit.is_free && !isPremium) || (isExamUnit && !coreCompleteForGroup);
       const total = unit.lessons?.length ?? 0;
       const doneCount = (unit.lessons ?? []).filter(
         (l) => progressByLesson[l.id] === "completed"
@@ -78,6 +87,19 @@ export default function LearningPath({ unitsByCycle, progressByLesson, isPremium
           0
         );
         const cycleComplete = cycleTotal > 0 && cycleDone === cycleTotal;
+
+        // Les unités "examen de cycle" (order_index > 10) ne doivent se
+        // débloquer qu'une fois les 10 unités régulières du cycle
+        // terminées — on calcule donc leur progression à part, sans
+        // compter l'examen lui-même dans le total.
+        const coreUnits = group.units.filter((u) => u.order_index <= 10);
+        const coreTotal = coreUnits.reduce((sum, u) => sum + (u.lessons?.length ?? 0), 0);
+        const coreDone = coreUnits.reduce(
+          (sum, u) =>
+            sum + (u.lessons ?? []).filter((l) => progressByLesson[l.id] === "completed").length,
+          0
+        );
+        const coreComplete = coreTotal > 0 && coreDone === coreTotal;
 
         return (
           <section
@@ -115,7 +137,10 @@ export default function LearningPath({ unitsByCycle, progressByLesson, isPremium
                   <div className="relative space-y-8">
                     {group.units.map((unit, i) => {
                       const Icon = unitIcon(unit.title_fr);
-                      const locked = !unit.is_free && !isPremium;
+                      const isExamUnit = unit.order_index > 10;
+                      const premiumLocked = !unit.is_free && !isPremium;
+                      const examLocked = isExamUnit && !coreComplete;
+                      const locked = premiumLocked || examLocked;
                       const total = unit.lessons?.length ?? 0;
                       const doneCount = (unit.lessons ?? []).filter(
                         (l) => progressByLesson[l.id] === "completed"
@@ -150,7 +175,11 @@ export default function LearningPath({ unitsByCycle, progressByLesson, isPremium
                                 {unit.title_fr}
                               </p>
                               <p className="text-xs font-bold text-ink/45 mt-0.5">
-                                {locked ? "Premium" : `${doneCount} / ${total} leçons`}
+                                {examLocked
+                                  ? "Terminez le cycle"
+                                  : premiumLocked
+                                  ? "Premium"
+                                  : `${doneCount} / ${total} leçons`}
                               </p>
                             </div>
                           </div>
