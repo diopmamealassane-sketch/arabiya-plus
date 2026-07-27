@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 
+// Empêche Next.js de mettre cette réponse en cache — sans cette ligne,
+// la première capsule tirée au sort était servie en boucle à tout le
+// monde au lieu d'être re-tirée à chaque appel.
+export const dynamic = "force-dynamic";
+
 // Pas de vérification d'auth ici : les capsules culturelles ne sont pas
 // une donnée sensible, et les afficher échoue silencieusement côté
 // client si l'appel rate — jamais bloquant pour la leçon elle-même.
