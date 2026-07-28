@@ -1,13 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Check } from "lucide-react";
 
 export default function PricingPage() {
   const [loading, setLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("annual");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   async function handleUpgrade(plan) {
+    if (!acceptedTerms) return;
     setLoading(true);
     const res = await fetch("/api/create-checkout-session", {
       method: "POST",
@@ -89,15 +92,42 @@ export default function PricingPage() {
               <Item light>Tableau de bord détaillé</Item>
               <Item light>Sans publicité</Item>
             </ul>
+
+            <label className="flex items-start gap-2 mb-4 text-sm opacity-80 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={acceptedTerms}
+                onChange={(e) => setAcceptedTerms(e.target.checked)}
+                className="mt-0.5 shrink-0"
+              />
+              <span>
+                J'accepte les{" "}
+                <Link href="/cgv" target="_blank" className="underline text-gold-light hover:opacity-100">
+                  Conditions Générales de Vente
+                </Link>{" "}
+                et je demande l'exécution immédiate du service dès la fin de l'essai gratuit, ce qui entraîne ma renonciation expresse à mon droit de rétractation dès l'accès au contenu Premium (
+                <Link href="/cgv#article-7" target="_blank" className="underline text-gold-light hover:opacity-100">
+                  Article 7
+                </Link>
+                ).
+              </span>
+            </label>
+
             <button
               onClick={() => handleUpgrade(selectedPlan)}
-              disabled={loading}
-              className="w-full bg-gradient-to-b from-gold-light to-gold text-[#241A02] font-bold py-3 rounded-xl disabled:opacity-50"
+              disabled={loading || !acceptedTerms}
+              className="w-full bg-gradient-to-b from-gold-light to-gold text-[#241A02] font-bold py-3 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Redirection…" : "Démarrer l'essai gratuit"}
             </button>
           </div>
         </div>
+
+        <p className="text-xs opacity-50">
+          <Link href="/mentions-legales" className="underline hover:opacity-100">Mentions légales</Link>
+          {" · "}
+          <Link href="/politique-confidentialite" className="underline hover:opacity-100">Politique de confidentialité</Link>
+        </p>
       </div>
     </main>
   );
