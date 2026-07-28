@@ -9,7 +9,7 @@ export default function CGVPage() {
     <main className="geo-bg min-h-screen">
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/" className="inline-flex items-center gap-2 mb-10">
-          <img src="/logo-mark.png" alt="Arabiya+" className="h-20 w-auto" />
+          <img src="/logo-mark.png" alt="Arabiya+" className="h-40 w-auto" />
         </Link>
         <h1 className="kufi text-3xl text-gold-light mb-8">Conditions Générales de Vente</h1>
         <div className="text-base">
