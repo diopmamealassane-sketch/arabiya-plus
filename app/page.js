@@ -151,6 +151,22 @@ export default function LandingPage() {
             </Link>
           </div>
         </div>
+
+        {/* Footer */}
+        <footer className="mt-24 pt-8 border-t border-gold/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm opacity-70">
+          <p>&copy; {new Date().getFullYear()} Arabiya+ — AMOCSSI GROUPE. Tous droits réservés.</p>
+          <div className="flex gap-6">
+            <Link href="/mentions-legales" className="hover:opacity-100 hover:underline">
+              Mentions légales
+            </Link>
+            <Link href="/cgv" className="hover:opacity-100 hover:underline">
+              CGV
+            </Link>
+            <Link href="/politique-confidentialite" className="hover:opacity-100 hover:underline">
+              Confidentialité
+            </Link>
+          </div>
+        </footer>
       </div>
     </main>
   );
