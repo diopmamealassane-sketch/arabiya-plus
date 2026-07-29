@@ -82,7 +82,7 @@ export default async function LessonPage({ params }) {
 
   const { data: words } = await supabase
     .from("words")
-    .select("id, arabic_vocalized, transliteration, french")
+    .select("id, arabic_vocalized, transliteration, french, audio_url")
     .in("id", Array.from(wordIds));
 
   const wordById = Object.fromEntries((words ?? []).map((w) => [w.id, w]));
