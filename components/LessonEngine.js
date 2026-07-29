@@ -35,6 +35,7 @@ export default function LessonEngine({
   const [cultureBite, setCultureBite] = useState(null);
   const voicesRef = useRef([]);
   const recognitionRef = useRef(null);
+  const audioRef = useRef(null);
 
   const doneReportedRef = useRef(false);
 
@@ -78,7 +79,50 @@ export default function LessonEngine({
     return () => window.speechSynthesis.removeEventListener("voiceschanged", loadVoices);
   }, []);
 
-  function speak(text) {
+  // Nettoyage : si l'utilisateur navigue pendant qu'un audio joue.
+  useEffect(() => {
+    return () => {
+      audioRef.current?.pause?.();
+    };
+  }, []);
+
+  // Lecture audio d'un mot : utilise le fichier audio ElevenLabs
+  // (word.audio_url) en priorité — c'est un vrai enregistrement, donc
+  // fonctionne partout, y compris dans l'app mobile (Capacitor WebView)
+  // où aucune voix arabe système n'est installée. Si le mot n'a pas
+  // encore d'audio généré (audio_url vide), on retombe sur la synthèse
+  // vocale du navigateur comme avant.
+  function playWord(word) {
+    if (!word) {
+      setLastSpokenOk(false);
+      return;
+    }
+
+    if (word.audio_url) {
+      try {
+        audioRef.current?.pause?.();
+        const audio = new Audio(word.audio_url);
+        audioRef.current = audio;
+        audio.onplay = () => setLastSpokenOk(true);
+        audio.onerror = () => {
+          // Fichier audio inaccessible (réseau, URL cassée…) → repli sur
+          // la synthèse vocale plutôt que de laisser l'utilisateur bloqué.
+          speakFallback(word.arabic_vocalized);
+        };
+        audio.play().catch(() => {
+          speakFallback(word.arabic_vocalized);
+        });
+        return;
+      } catch {
+        speakFallback(word.arabic_vocalized);
+        return;
+      }
+    }
+
+    speakFallback(word.arabic_vocalized);
+  }
+
+  function speakFallback(text) {
     if (!text || !("speechSynthesis" in window)) {
       setLastSpokenOk(false);
       return;
@@ -367,7 +411,7 @@ export default function LessonEngine({
               </div>
               <div className="flex justify-center">
                 <button
-                  onClick={() => speak(step.word?.arabic_vocalized)}
+                  onClick={() => playWord(step.word)}
                   className="w-12 h-12 rounded-full bg-ink text-gold-light flex items-center justify-center speak-pulse"
                 >
                   <Volume2 size={22} />
@@ -375,7 +419,7 @@ export default function LessonEngine({
               </div>
               {lastSpokenOk === false && (
                 <p className="text-sm text-center text-[#8a8264] mt-3">
-                  🔇 Pas de voix arabe sur cet appareil — appuyez-vous sur la transcription phonétique.
+                  🔇 Audio indisponible pour ce mot — appuyez-vous sur la transcription phonétique.
                 </p>
               )}
               <button
@@ -394,7 +438,7 @@ export default function LessonEngine({
               <div className="text-center mb-4">
                 <div className="arabic text-4xl" dir="rtl">{step.promptWord?.arabic_vocalized}</div>
                 <button
-                  onClick={() => speak(step.promptWord?.arabic_vocalized)}
+                  onClick={() => playWord(step.promptWord)}
                   className="w-10 h-10 mx-auto mt-2 rounded-full bg-ink text-gold-light flex items-center justify-center"
                 >
                   <Volume2 size={18} />
@@ -476,14 +520,14 @@ export default function LessonEngine({
               <p className="font-semibold mb-4">Écoutez, puis choisissez la bonne traduction</p>
               <div className="flex flex-col items-center mb-5">
                 <button
-                  onClick={() => speak(step.word?.arabic_vocalized)}
+                  onClick={() => playWord(step.word)}
                   className="w-16 h-16 rounded-full bg-ink text-gold-light flex items-center justify-center speak-pulse"
                 >
                   <Volume2 size={28} />
                 </button>
                 {lastSpokenOk === false && (
                   <p className="text-sm text-center text-[#8a8264] mt-3">
-                    🔇 Pas de voix arabe disponible.
+                    🔇 Audio indisponible.
                     <br />
                     Prononciation phonétique : <em>{step.word?.transliteration}</em>
                   </p>
@@ -513,7 +557,7 @@ export default function LessonEngine({
               <p className="text-sm text-[#8a8264] mb-4">Compréhension orale + production écrite</p>
               <div className="flex justify-center mb-5">
                 <button
-                  onClick={() => speak(step.word?.arabic_vocalized)}
+                  onClick={() => playWord(step.word)}
                   className="w-16 h-16 rounded-full bg-ink text-gold-light flex items-center justify-center speak-pulse"
                 >
                   <Volume2 size={28} />
@@ -521,7 +565,7 @@ export default function LessonEngine({
               </div>
               {lastSpokenOk === false && (
                 <p className="text-sm text-center text-[#8a8264] mb-4">
-                  🔇 Pas de voix arabe disponible.
+                  🔇 Audio indisponible.
                   <br />
                   Prononciation phonétique : <em>{step.word?.transliteration}</em>
                 </p>
@@ -579,7 +623,7 @@ export default function LessonEngine({
               </div>
               <div className="flex justify-center gap-4 mb-5">
                 <button
-                  onClick={() => speak(step.word?.arabic_vocalized)}
+                  onClick={() => playWord(step.word)}
                   className="w-14 h-14 rounded-full bg-ink text-gold-light flex items-center justify-center speak-pulse"
                   title="Écouter la prononciation"
                 >
