@@ -83,8 +83,12 @@ export default async function DashboardPage() {
       {/* Bannière */}
       <div className="bg-gradient-to-br from-ink to-ink-2 text-white px-5 pt-6 pb-11 relative overflow-hidden">
         <div className="flex items-center justify-between relative z-10">
-          <Link href="/">
-            <img src="/logo-mark.png" alt="Arabiya+" className="h-52 w-auto" />
+          <Link href="/" className="shrink-0 max-w-[45%]">
+            <img
+              src="/logo-mark.png"
+              alt="Arabiya+"
+              className="h-24 w-auto max-w-full object-contain"
+            />
           </Link>
           <div className="flex gap-2.5">
             <span className="bg-white/15 backdrop-blur rounded-full px-3.5 py-1.5 text-sm font-extrabold flex items-center gap-1.5">
