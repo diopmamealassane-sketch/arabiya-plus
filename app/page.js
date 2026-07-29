@@ -18,7 +18,8 @@ export default function LandingPage() {
       <div className="max-w-5xl mx-auto px-6 py-20">
         <nav className="flex items-center justify-between mb-20">
           <Link href="/">
-            <img src="/logo-mark.png" alt="Arabiya+" className="h-24 w-auto" />
+            <img src="/logo-mark.png" alt="Arabiya+" className="h-20 sm:h-24 w-auto object-contain" />
+          </Link>
           <div className="flex gap-6 items-center text-base">
             <Link href="/test-niveau" className="opacity-80 hover:opacity-100">Test de niveau</Link>
             <Link href="/pricing" className="opacity-80 hover:opacity-100">Tarifs</Link>
@@ -100,92 +101,3 @@ export default function LandingPage() {
         </div>
 
         {/* Le parcours complet */}
-        <div className="mt-24">
-          <p className="text-gold-light uppercase tracking-widest text-sm font-semibold text-center mb-3">
-            Le parcours complet
-          </p>
-          <h2 className="text-3xl font-bold text-center mb-12">
-            Du premier bonjour à l'éloquence
-          </h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            {CYCLES.map((cycle, i) => (
-              <div
-                key={cycle.code}
-                className="flex items-center gap-4 bg-ink-2/60 border border-gold/20 rounded-2xl p-5"
-              >
-                <div className="shrink-0 w-12 h-12 rounded-full bg-gold/15 text-gold-light font-black flex items-center justify-center">
-                  {cycle.code}
-                </div>
-                <div>
-                  <h3 className="font-semibold">
-                    Cycle {i + 1} — {cycle.label}
-                  </h3>
-                  <p className="text-base opacity-70">{cycle.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* CTA final */}
-        <div className="text-center max-w-xl mx-auto mt-24">
-          <h2 className="text-2xl font-bold mb-4">
-            Prêt à commencer votre parcours ?
-          </h2>
-          <p className="opacity-80 mb-8">
-            Gratuit pour démarrer, sans engagement. Découvrez votre niveau en quelques minutes.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link
-              href="/test-niveau"
-              className="inline-flex items-center justify-center gap-2 bg-gradient-to-b from-gold-light to-gold text-[#241A02] font-bold px-8 py-4 rounded-2xl"
-            >
-              Faire le test de niveau gratuit <ArrowRight size={20} />
-            </Link>
-            <Link
-              href="/signup"
-              className="inline-flex items-center justify-center gap-2 border-2 border-gold/40 font-bold px-8 py-4 rounded-2xl"
-            >
-              Commencer gratuitement
-            </Link>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <footer className="mt-24 pt-8 border-t border-gold/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm opacity-70">
-          <p>&copy; {new Date().getFullYear()} Arabiya+ — AMOCSSI GROUPE. Tous droits réservés.</p>
-          <div className="flex gap-6">
-            <Link href="/mentions-legales" className="hover:opacity-100 hover:underline">
-              Mentions légales
-            </Link>
-            <Link href="/cgv" className="hover:opacity-100 hover:underline">
-              CGV
-            </Link>
-            <Link href="/politique-confidentialite" className="hover:opacity-100 hover:underline">
-              Confidentialité
-            </Link>
-          </div>
-        </footer>
-      </div>
-    </main>
-  );
-}
-
-function Stat({ value, label }) {
-  return (
-    <div className="bg-ink-2/60 border border-gold/20 rounded-2xl p-5 text-center">
-      <p className="text-3xl font-black text-gold-light">{value}</p>
-      <p className="text-sm opacity-70 mt-1">{label}</p>
-    </div>
-  );
-}
-
-function Feature({ icon, title, children }) {
-  return (
-    <div className="bg-ink-2/60 border border-gold/20 rounded-2xl p-6">
-      <div className="text-gold-light mb-3">{icon}</div>
-      <h3 className="font-semibold mb-2">{title}</h3>
-      <p className="text-base opacity-70">{children}</p>
-    </div>
-  );
-}
