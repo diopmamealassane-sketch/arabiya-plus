@@ -84,7 +84,7 @@ export default async function DashboardPage() {
       <div className="bg-gradient-to-br from-ink to-ink-2 text-white px-5 pt-6 pb-11 relative overflow-hidden">
         <div className="flex items-center justify-between relative z-10">
           <Link href="/">
-            <img src="/logo-mark.png" alt="Arabiya+" className="h-44 w-auto" />
+            <img src="/logo-mark.png" alt="Arabiya+" className="h-52 w-auto" />
           </Link>
           <div className="flex gap-2.5">
             <span className="bg-white/15 backdrop-blur rounded-full px-3.5 py-1.5 text-sm font-extrabold flex items-center gap-1.5">
