@@ -35,10 +35,10 @@ export default function LandingPage() {
 
         {/* Hero */}
         <div className="text-center max-w-2xl mx-auto float-in">
-          <p className="text-gold-light uppercase tracking-widest text-sm font-semibold mb-4">
+          <p className="text-gold-light uppercase tracking-widest text-sm font-semibold mb-10 md:mb-14">
             Pour francophones — du débutant à la maîtrise
           </p>
-          <h1 className="arabic text-6xl mb-6" dir="rtl">
+          <h1 className="arabic text-6xl mt-4 mb-10 md:mt-6 md:mb-14" dir="rtl">
             مَرْحَبًا بِكَ
           </h1>
           <p className="text-2xl font-semibold mb-4">
@@ -189,4 +189,4 @@ function Feature({ icon, title, children }) {
       <p className="text-base opacity-70">{children}</p>
     </div>
   );
-          }
+}
