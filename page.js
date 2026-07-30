@@ -24,7 +24,7 @@ export default function LandingPage() {
           <p className="text-gold-light uppercase tracking-widest text-xs font-semibold mb-4">
             Pour francophones débutants
           </p>
-          <h1 className="arabic text-6xl mt-6 mb-8 md:mt-8 md:mb-10" dir="rtl">
+          <h1 className="arabic text-6xl mt-12 mb-14 md:mt-16 md:mb-20" dir="rtl">
             مَرْحَبًا بِكَ
           </h1>
           <p className="text-2xl font-semibold mb-4">Apprenez l'arabe, vraiment.</p>
