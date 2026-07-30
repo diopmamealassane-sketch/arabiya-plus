@@ -21,7 +21,7 @@ export default function LandingPage() {
         </nav>
 
         <div className="text-center max-w-2xl mx-auto float-in">
-          <p className="text-gold-light uppercase tracking-widest text-xs font-semibold mb-4">
+          <p className="text-gold-light uppercase tracking-widest text-xs font-semibold mb-8 md:mb-10">
             Pour francophones débutants
           </p>
           <h1 className="arabic text-6xl mt-12 mb-14 md:mt-16 md:mb-20" dir="rtl">
