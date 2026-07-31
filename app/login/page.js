@@ -31,7 +31,7 @@ export default function LoginPage() {
     <main className="geo-bg min-h-screen flex items-center justify-center px-4">
       <form onSubmit={handleSubmit} className="bg-parchment text-ink rounded-2xl p-8 w-full max-w-sm float-in">
         <Link href="/" className="block">
-          <img src="/logo-mark.png" alt="Arabiya+" className="h-24 w-auto mx-auto mb-5" />
+          <img src="/logo-mark.png" alt="Arabiya+" className="h-32 w-auto mx-auto mb-5" />
         </Link>
         <h1 className="text-xl font-bold mb-6">Se connecter</h1>
         <label className="block text-base font-semibold mb-1">Email</label>
