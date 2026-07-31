@@ -87,7 +87,7 @@ export default async function DashboardPage() {
             <img
               src="/logo-mark.png"
               alt="Arabiya+"
-              className="h-34 w-auto max-w-full object-contain"
+              className="h-32 w-auto max-w-full object-contain"
             />
           </Link>
           <div className="flex gap-2.5">
