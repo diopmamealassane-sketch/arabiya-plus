@@ -58,6 +58,18 @@ export async function POST(request) {
         .eq("stripe_customer_id", sub.customer);
       break;
     }
+    case "invoice.payment_failed": {
+      const invoice = event.data.object;
+      // On ne touche que les factures liées à un abonnement récurrent
+      // (ignore les factures ponctuelles hors abonnement, s'il y en a un jour).
+      if (invoice.customer) {
+        await db
+          .from("subscriptions")
+          .update({ status: "past_due" })
+          .eq("stripe_customer_id", invoice.customer);
+      }
+      break;
+    }
     default:
       break; // ignore other event types
   }
