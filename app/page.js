@@ -18,7 +18,7 @@ export default function LandingPage() {
       <div className="max-w-5xl mx-auto px-6 py-20">
         <nav className="flex items-center justify-between mb-20">
           <Link href="/">
-            <img src="/logo-mark.png" alt="Arabiya+" className="h-52 w-auto" />
+            <img src="/logo-mark.png" alt="Arabiya+" className="h-20 sm:h-32 w-auto object-contain" />
           </Link>
           <div className="flex gap-6 items-center text-base">
             <Link href="/test-niveau" className="opacity-80 hover:opacity-100">Test de niveau</Link>
@@ -35,10 +35,10 @@ export default function LandingPage() {
 
         {/* Hero */}
         <div className="text-center max-w-2xl mx-auto float-in">
-          <p className="text-gold-light uppercase tracking-widest text-sm font-semibold mb-4">
+          <p className="text-gold-light uppercase tracking-widest text-sm font-semibold mb-10 md:mb-14">
             Pour francophones — du débutant à la maîtrise
           </p>
-          <h1 className="arabic text-6xl mb-6" dir="rtl">
+          <h1 className="arabic text-6xl mt-4 mb-10 md:mt-6 md:mb-14" dir="rtl">
             مَرْحَبًا بِكَ
           </h1>
           <p className="text-2xl font-semibold mb-4">
