@@ -1,60 +1,105 @@
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import { NextResponse } from "next/server";
+import { createServerSupabaseClient } from "@/lib/supabase-server";
+import { generateCertificatePdf } from "@/lib/certificate";
 
-const NAVY = rgb(0x14 / 255, 0x20 / 255, 0x38 / 255);
-const GOLD = rgb(0xd1 / 255, 0xaa / 255, 0x41 / 255);
-const WHITE = rgb(1, 1, 1);
-const MUTED = rgb(0.8, 0.8, 0.85);
-const MUTED_DIM = rgb(0.55, 0.55, 0.6);
+const CYCLE_LABELS = {
+  A1: "Cycle 1 — Débutant (A1)",
+  A2: "Cycle 2 — Élémentaire (A2)",
+  B1: "Cycle 3 — Intermédiaire (B1)",
+  B2: "Cycle 4 — Intermédiaire supérieur (B2)",
+  C1: "Cycle 5 — Avancé (C1)",
+  C2: "Cycle 6 — Expert (C2)",
+};
 
-// Génère le PDF du certificat de fin de cycle — format A4 paysage,
-// couleurs de marque (navy/or), aucune police externe requise (donc
-// aucun risque de rendu cassé sur Vercel : uniquement les polices
-// standard intégrées à pdf-lib).
-export async function generateCertificatePdf({ userName, cycleLabel, unitsCount, lessonsCount, dateStr }) {
-  const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage([842, 595]); // A4 paysage en points
-  const { width, height } = page.getSize();
+export const dynamic = "force-dynamic";
 
-  const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const fontItalic = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const cycle = searchParams.get("cycle");
 
-  page.drawRectangle({ x: 0, y: 0, width, height, color: NAVY });
-
-  const margin = 24;
-  page.drawRectangle({
-    x: margin,
-    y: margin,
-    width: width - margin * 2,
-    height: height - margin * 2,
-    borderColor: GOLD,
-    borderWidth: 2,
-  });
-  const margin2 = 32;
-  page.drawRectangle({
-    x: margin2,
-    y: margin2,
-    width: width - margin2 * 2,
-    height: height - margin2 * 2,
-    borderColor: GOLD,
-    borderWidth: 0.75,
-  });
-
-  function centerText(text, y, font, size, color) {
-    const textWidth = font.widthOfTextAtSize(text, size);
-    page.drawText(text, { x: (width - textWidth) / 2, y, font, size, color });
+  if (!cycle || !CYCLE_LABELS[cycle]) {
+    return NextResponse.json({ error: "Paramètre 'cycle' invalide." }, { status: 400 });
   }
 
-  centerText("ARABIYA+", height - 90, fontBold, 22, GOLD);
-  centerText("CERTIFICAT DE RÉUSSITE", height - 160, fontBold, 30, WHITE);
-  centerText("Ce certificat est décerné à", height - 210, fontRegular, 14, MUTED);
-  centerText(userName, height - 255, fontBold, 34, GOLD);
-  centerText("pour avoir achevé avec succès le", height - 300, fontRegular, 14, MUTED);
-  centerText(cycleLabel, height - 335, fontBold, 22, WHITE);
-  centerText(`${unitsCount} unités — ${lessonsCount} leçons complétées`, height - 365, fontRegular, 13, MUTED);
+  const supabase = createServerSupabaseClient();
 
-  centerText(dateStr, 90, fontItalic, 12, rgb(0.7, 0.7, 0.75));
-  centerText("Arabiya+ — Apprendre l'arabe autrement", 60, fontRegular, 10, MUTED_DIM);
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
 
-  return pdfDoc.save();
+  if (authError || !user) {
+    return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
+  }
+
+  // Unités "core" (order_index <= 10) du cycle demandé, avec leurs leçons —
+  // même filtre que côté client dans LearningPath.js.
+  const { data: units, error: unitsError } = await supabase
+    .from("units")
+    .select("id, order_index, lessons(id)")
+    .eq("cycle", cycle)
+    .lte("order_index", 10);
+
+  if (unitsError || !units || units.length === 0) {
+    return NextResponse.json({ error: "Cycle introuvable." }, { status: 404 });
+  }
+
+  const lessonIds = units.flatMap((u) => (u.lessons ?? []).map((l) => l.id));
+  const totalLessons = lessonIds.length;
+
+  if (totalLessons === 0) {
+    return NextResponse.json({ error: "Cycle vide." }, { status: 404 });
+  }
+
+  // Revérification côté serveur : impossible d'obtenir le certificat en
+  // trafiquant l'URL, on recompte la progression réelle en base.
+  const { data: progress, error: progressError } = await supabase
+    .from("user_progress")
+    .select("lesson_id")
+    .eq("user_id", user.id)
+    .in("lesson_id", lessonIds)
+    .eq("status", "completed");
+
+  if (progressError) {
+    return NextResponse.json({ error: "Erreur de vérification de la progression." }, { status: 500 });
+  }
+
+  const doneCount = progress?.length ?? 0;
+
+  if (doneCount < totalLessons) {
+    return NextResponse.json({ error: "Ce cycle n'est pas encore terminé." }, { status: 403 });
+  }
+
+  // Nom affiché : profil Supabase, repli sur la partie avant le @ de l'email.
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("full_name, name")
+    .eq("id", user.id)
+    .single();
+
+  const userName =
+    profile?.full_name || profile?.name || user.email?.split("@")[0] || "Étudiant Arabiya+";
+
+  const dateStr = new Date().toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
+  const pdfBytes = await generateCertificatePdf({
+    userName,
+    cycleLabel: CYCLE_LABELS[cycle],
+    unitsCount: units.length,
+    lessonsCount: totalLessons,
+    dateStr,
+  });
+
+  return new NextResponse(pdfBytes, {
+    status: 200,
+    headers: {
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `attachment; filename="Certificat-Arabiya-Plus-${cycle}.pdf"`,
+      "Cache-Control": "no-store",
+    },
+  });
 }
