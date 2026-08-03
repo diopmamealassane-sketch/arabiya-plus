@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 
 export default function SignupPage() {
   const supabase = createClient();
+  const [fullName, setFullName] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,6 +23,7 @@ export default function SignupPage() {
       password,
       options: {
         data: {
+          full_name: fullName.trim(),
           display_name: displayName.trim(),
         },
       },
@@ -54,6 +56,18 @@ export default function SignupPage() {
           <img src="/logo-mark.png" alt="Arabiya+" className="h-24 w-auto mx-auto mb-5" />
         </Link>
         <h1 className="text-xl font-bold mb-6">Créer un compte</h1>
+
+        <label className="block text-base font-semibold mb-1">Nom et prénom</label>
+        <input
+          type="text"
+          required
+          minLength={2}
+          maxLength={60}
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          placeholder="Utilisé sur votre certificat"
+          className="w-full border-2 border-black/10 rounded-xl px-3 py-2 mb-4"
+        />
 
         <label className="block text-base font-semibold mb-1">Pseudo</label>
         <input
