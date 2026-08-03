@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createServerSupabaseClient } from "@/lib/supabase-server";
+import { createServerSupabaseClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { generateCertificatePdf } from "@/lib/certificate";
 
 const CYCLE_LABELS = {
@@ -21,20 +21,20 @@ export async function GET(request) {
     return NextResponse.json({ error: "Paramètre 'cycle' invalide." }, { status: 400 });
   }
 
-  const supabase = createServerSupabaseClient();
-
+  const sessionClient = createServerSupabaseClient();
   const {
     data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
+  } = await sessionClient.auth.getUser();
 
-  if (authError || !user) {
+  if (!user) {
     return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
   }
 
+  const db = createServiceRoleClient();
+
   // Unités "core" (order_index <= 10) du cycle demandé, avec leurs leçons —
   // même filtre que côté client dans LearningPath.js.
-  const { data: units, error: unitsError } = await supabase
+  const { data: units, error: unitsError } = await db
     .from("units")
     .select("id, order_index, lessons(id)")
     .eq("cycle", cycle)
@@ -53,12 +53,12 @@ export async function GET(request) {
 
   // Revérification côté serveur : impossible d'obtenir le certificat en
   // trafiquant l'URL, on recompte la progression réelle en base.
-  const { data: progress, error: progressError } = await supabase
+  const { data: progress, error: progressError } = await db
     .from("user_progress")
     .select("lesson_id")
     .eq("user_id", user.id)
-    .in("lesson_id", lessonIds)
-    .eq("status", "completed");
+    .eq("status", "completed")
+    .in("lesson_id", lessonIds);
 
   if (progressError) {
     return NextResponse.json({ error: "Erreur de vérification de la progression." }, { status: 500 });
@@ -70,15 +70,13 @@ export async function GET(request) {
     return NextResponse.json({ error: "Ce cycle n'est pas encore terminé." }, { status: 403 });
   }
 
-  // Nom affiché : profil Supabase, repli sur la partie avant le @ de l'email.
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("full_name, name")
-    .eq("id", user.id)
-    .single();
-
+  // Nom affiché : métadonnées du compte Supabase Auth, repli sur la
+  // partie avant le @ de l'email si aucun nom n'est renseigné.
   const userName =
-    profile?.full_name || profile?.name || user.email?.split("@")[0] || "Étudiant Arabiya+";
+    user.user_metadata?.display_name ||
+    user.user_metadata?.full_name ||
+    user.email?.split("@")[0] ||
+    "Étudiant Arabiya+";
 
   const dateStr = new Date().toLocaleDateString("fr-FR", {
     day: "numeric",
