@@ -70,11 +70,11 @@ export async function GET(request) {
     return NextResponse.json({ error: "Ce cycle n'est pas encore terminé." }, { status: 403 });
   }
 
-  // Nom affiché : métadonnées du compte Supabase Auth, repli sur la
-  // partie avant le @ de l'email si aucun nom n'est renseigné.
+  // Nom affiché : nom et prénom saisis à l'inscription en priorité,
+  // repli sur le pseudo, puis sur la partie avant le @ de l'email.
   const userName =
-    user.user_metadata?.display_name ||
     user.user_metadata?.full_name ||
+    user.user_metadata?.display_name ||
     user.email?.split("@")[0] ||
     "Étudiant Arabiya+";
 
