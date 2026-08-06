@@ -41,12 +41,19 @@ export async function POST(request) {
       else if (["canceled", "unpaid", "incomplete_expired"].includes(sub.status)) status = "canceled";
       else status = "past_due";
 
+      // current_period_end est désormais au niveau de l'item d'abonnement,
+      // pas au niveau de l'abonnement lui-même (changement d'API Stripe récent).
+      const periodEndTimestamp =
+        sub.current_period_end ?? sub.items?.data?.[0]?.current_period_end;
+
+      const updateData = { status };
+      if (periodEndTimestamp) {
+        updateData.current_period_end = new Date(periodEndTimestamp * 1000).toISOString();
+      }
+
       await db
         .from("subscriptions")
-        .update({
-          status,
-          current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
-        })
+        .update(updateData)
         .eq("stripe_customer_id", sub.customer);
       break;
     }
