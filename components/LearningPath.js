@@ -32,6 +32,14 @@ function unitIcon(title) {
   return BookOpen;
 }
 
+// Une unité est un "examen de cycle" si son titre l'indique explicitement,
+// pas selon sa position — ça évite qu'une nouvelle unité ajoutée après les
+// 10 unités classiques (ex. une unité de révision) soit prise à tort pour
+// l'examen final et se retrouve verrouillée jusqu'à la fin du cycle.
+function isExamUnitTitle(title) {
+  return title.startsWith("Examen de cycle");
+}
+
 export default function LearningPath({ unitsByCycle, progressByLesson, isPremium }) {
   const [expandedUnitId, setExpandedUnitId] = useState(null);
 
@@ -42,7 +50,7 @@ export default function LearningPath({ unitsByCycle, progressByLesson, isPremium
   let currentUnitId = null;
   let currentCycle = null;
   outer: for (const group of unitsByCycle) {
-    const coreUnitsForGroup = group.units.filter((u) => u.order_index <= 10);
+    const coreUnitsForGroup = group.units.filter((u) => !isExamUnitTitle(u.title_fr));
     const coreTotalForGroup = coreUnitsForGroup.reduce((sum, u) => sum + (u.lessons?.length ?? 0), 0);
     const coreDoneForGroup = coreUnitsForGroup.reduce(
       (sum, u) => sum + (u.lessons ?? []).filter((l) => progressByLesson[l.id] === "completed").length,
@@ -51,7 +59,7 @@ export default function LearningPath({ unitsByCycle, progressByLesson, isPremium
     const coreCompleteForGroup = coreTotalForGroup > 0 && coreDoneForGroup === coreTotalForGroup;
 
     for (const unit of group.units) {
-      const isExamUnit = unit.order_index > 10;
+      const isExamUnit = isExamUnitTitle(unit.title_fr);
       const locked = (!unit.is_free && !isPremium) || (isExamUnit && !coreCompleteForGroup);
       const total = unit.lessons?.length ?? 0;
       const doneCount = (unit.lessons ?? []).filter(
@@ -88,11 +96,10 @@ export default function LearningPath({ unitsByCycle, progressByLesson, isPremium
         );
         const cycleComplete = cycleTotal > 0 && cycleDone === cycleTotal;
 
-        // Les unités "examen de cycle" (order_index > 10) ne doivent se
-        // débloquer qu'une fois les 10 unités régulières du cycle
-        // terminées — on calcule donc leur progression à part, sans
-        // compter l'examen lui-même dans le total.
-        const coreUnits = group.units.filter((u) => u.order_index <= 10);
+        // Les unités "examen de cycle" ne doivent se débloquer qu'une fois
+        // toutes les autres unités du cycle terminées — on calcule donc leur
+        // progression à part, sans compter l'examen lui-même dans le total.
+        const coreUnits = group.units.filter((u) => !isExamUnitTitle(u.title_fr));
         const coreTotal = coreUnits.reduce((sum, u) => sum + (u.lessons?.length ?? 0), 0);
         const coreDone = coreUnits.reduce(
           (sum, u) =>
@@ -148,7 +155,7 @@ export default function LearningPath({ unitsByCycle, progressByLesson, isPremium
                   <div className="relative space-y-8">
                     {group.units.map((unit, i) => {
                       const Icon = unitIcon(unit.title_fr);
-                      const isExamUnit = unit.order_index > 10;
+                      const isExamUnit = isExamUnitTitle(unit.title_fr);
                       const premiumLocked = !unit.is_free && !isPremium;
                       const examLocked = isExamUnit && !coreComplete;
                       const locked = premiumLocked || examLocked;
