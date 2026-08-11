@@ -18,7 +18,7 @@ export default function LandingPage() {
       <div className="max-w-5xl mx-auto px-6 py-20">
         <nav className="flex items-center justify-between mb-20">
           <Link href="/">
-            <img src="/logo-mark.png" alt="Arabiya+" className="h-20 sm:h-24 w-auto object-contain" />
+            <img src="/logo-mark.png" alt="Arabiya+" className="h-20 sm:h-34 w-auto object-contain" />
           </Link>
           <div className="flex gap-6 items-center text-base">
             <Link href="/test-niveau" className="opacity-80 hover:opacity-100">Test de niveau</Link>
