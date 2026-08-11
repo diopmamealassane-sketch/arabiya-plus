@@ -18,7 +18,7 @@ export default function LandingPage() {
       <div className="max-w-5xl mx-auto px-6 py-20">
         <nav className="flex items-center justify-between mb-20">
           <Link href="/">
-            <img src="/logo-mark.png" alt="Arabiya+" className="h-20 sm:h-32 w-auto object-contain" />
+            <img src="/logo-mark.png" alt="Arabiya+" className="h-20 sm:h-24 w-auto object-contain" />
           </Link>
           <div className="flex gap-6 items-center text-base">
             <Link href="/test-niveau" className="opacity-80 hover:opacity-100">Test de niveau</Link>
@@ -38,7 +38,7 @@ export default function LandingPage() {
           <p className="text-gold-light uppercase tracking-widest text-sm font-semibold mb-10 md:mb-14">
             Pour francophones — du débutant à la maîtrise
           </p>
-          <h1 className="arabic text-6xl mt-4 mb-10 md:mt-6 md:mb-14" dir="rtl">
+          <h1 className="arabic text-6xl mt-12 mb-14 md:mt-16 md:mb-20" dir="rtl">
             مَرْحَبًا بِكَ
           </h1>
           <p className="text-2xl font-semibold mb-4">
@@ -64,9 +64,9 @@ export default function LandingPage() {
 
         {/* Bandeau chiffres */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-24">
-          <Stat value="600" label="leçons" />
+          <Stat value="669" label="leçons" />
           <Stat value="6" label="niveaux (A1 → C2)" />
-          <Stat value="60" label="unités thématiques" />
+          <Stat value="69" label="unités thématiques" />
           <Stat value="100%" label="pensé pour les francophones" />
         </div>
 
