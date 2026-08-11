@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   ArrowRight, Volume2, Repeat, Trophy, Target, Mic, Award, Sparkles,
+  Headphones, BookOpen, PenLine,
 } from "lucide-react";
 
 const CYCLES = [
@@ -100,6 +101,22 @@ export default function LandingPage() {
           </div>
         </div>
 
+        {/* Les 4 compétences clés */}
+        <div className="mt-24">
+          <p className="text-gold-light uppercase tracking-widest text-sm font-semibold text-center mb-3">
+            Les 4 compétences clés
+          </p>
+          <h2 className="text-3xl font-bold text-center mb-12">
+            Pour une vraie maîtrise de la langue
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <Skill icon={<Headphones />} title="Écouter" subtitle="Compréhension orale" />
+            <Skill icon={<Mic />} title="Parler" subtitle="Production orale" />
+            <Skill icon={<BookOpen />} title="Lire" subtitle="Compréhension écrite" />
+            <Skill icon={<PenLine />} title="Écrire" subtitle="Production écrite" />
+          </div>
+        </div>
+
         {/* Le parcours complet */}
         <div className="mt-24">
           <p className="text-gold-light uppercase tracking-widest text-sm font-semibold text-center mb-3">
@@ -187,6 +204,18 @@ function Feature({ icon, title, children }) {
       <div className="text-gold-light mb-3">{icon}</div>
       <h3 className="font-semibold mb-2">{title}</h3>
       <p className="text-base opacity-70">{children}</p>
+    </div>
+  );
+}
+
+function Skill({ icon, title, subtitle }) {
+  return (
+    <div className="text-center">
+      <div className="w-16 h-16 mx-auto rounded-full bg-gold/15 flex items-center justify-center text-gold-light mb-3">
+        {icon}
+      </div>
+      <h3 className="font-semibold">{title}</h3>
+      <p className="text-sm opacity-70 italic">{subtitle}</p>
     </div>
   );
 }
