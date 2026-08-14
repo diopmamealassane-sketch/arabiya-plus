@@ -20,7 +20,7 @@ export default function CGVPage() {
 <h2 className="kufi text-xl text-gold-light mt-10 mb-3">Article 2 — Description du service</h2>
 <p className="opacity-80 leading-relaxed mb-4">Arabiya+ est une application d'apprentissage de la langue arabe destinée aux francophones, accessible via le site arabiya-plus.com. Le service propose :</p>
 <ul className="list-disc pl-6 opacity-80 leading-relaxed mb-4 space-y-1">
-<li>Une <strong className="text-gold-light font-semibold">offre gratuite</strong> donnant accès à un nombre limité de leçons (2 premières unités du Cycle 1) ;</li>
+<li>Une <strong className="text-gold-light font-semibold">offre gratuite</strong> donnant accès à un nombre limité de leçons (7 premières unités du Cycle 1) ;</li>
 <li>Une <strong className="text-gold-light font-semibold">offre Premium</strong>, payante, donnant accès à l'intégralité du contenu pédagogique correspondant au cycle souscrit, aux révisions illimitées, au tableau de bord détaillé, et à une expérience sans publicité.</li>
 </ul>
 <h2 className="kufi text-xl text-gold-light mt-10 mb-3">Article 3 — Tarifs</h2>
