@@ -125,7 +125,7 @@ export default async function DashboardPage() {
         {!isPremium && (
           <div className="bg-white border border-gold/30 rounded-2xl p-4 mb-10 shadow-md flex items-center justify-between gap-3">
             <p className="text-base text-ink/70 font-semibold">
-              7 unités gratuites débloquées. Passez Premium pour le reste du parcours.
+              5 unités gratuites débloquées. Passez Premium pour le reste du parcours.
             </p>
             <Link
               href="/pricing"
