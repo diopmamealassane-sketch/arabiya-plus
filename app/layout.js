@@ -1,5 +1,6 @@
 import "./globals.css";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata = {
   title: "Arabiya+ — Apprendre l'arabe",
@@ -32,6 +33,7 @@ export default function RootLayout({ children }) {
       <body className="font-sans text-parchment">
         <ServiceWorkerRegister />
         {children}
+        <Analytics />
       </body>
     </html>
   );
