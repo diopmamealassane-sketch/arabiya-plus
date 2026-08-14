@@ -38,7 +38,7 @@ export default function PricingPage() {
           30 jours d'essai gratuit sur tous les plans Premium — annulez à tout moment avant la fin de l'essai, sans frais.
         </p>
         <p className="text-sm opacity-50 mb-12">
-          Une carte bancaire est demandée à l'inscription pour activer l'essai, mais vous n'êtes prélevé qu'à son terme.
+          Aucune carte bancaire requise pour démarrer. Vous pourrez en ajouter une avant la fin de l'essai pour continuer sans interruption.
         </p>
 
         <div className="grid md:grid-cols-2 gap-6 text-left mb-8">
@@ -87,7 +87,8 @@ export default function PricingPage() {
             </div>
 
             <ul className="space-y-2 text-base mb-6">
-              <Item light>Cycle 1 (A1) complet</Item>
+              <Item light>6 cycles complets, du A1 au C2</Item>
+              <Item light>600+ leçons et 60+ unités thématiques</Item>
               <Item light>Révisions illimitées</Item>
               <Item light>Tableau de bord détaillé</Item>
               <Item light>Sans publicité</Item>
