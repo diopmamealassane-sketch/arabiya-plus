@@ -36,17 +36,18 @@ export async function POST(request) {
     line_items: [{ price: priceId, quantity: 1 }],
     client_reference_id: user.id, // read back in the webhook to know which user paid
     customer_email: user.email,
-    // Essai gratuit de 30 jours — carte obligatoire dès l'inscription
-    // (payment_method_collection: "always" force la saisie même pendant
-    // l'essai) et l'abonnement est annulé automatiquement si aucun moyen
-    // de paiement valide n'est enregistré à la fin de l'essai.
+    // Essai gratuit de 30 jours — aucune carte requise pour démarrer
+    // (payment_method_collection reste sur son défaut "if_required", donc
+    // Stripe ne la demande pas puisque 0€ est dû aujourd'hui). L'utilisateur
+    // peut ajouter une carte à tout moment depuis son espace client. Si
+    // aucune carte n'est enregistrée à la fin des 30 jours, l'abonnement est
+    // automatiquement annulé (pas de prélèvement surprise).
     subscription_data: {
       trial_period_days: 30,
       trial_settings: {
         end_behavior: { missing_payment_method: "cancel" },
       },
     },
-    payment_method_collection: "always",
     success_url: `${origin}/dashboard?checkout=success`,
     cancel_url: `${origin}/pricing`,
   });
