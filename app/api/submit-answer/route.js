@@ -79,11 +79,6 @@ export async function POST(request) {
     const isSameWeek = stats?.week_start_date === currentWeekStart;
     const newWeeklyXp = isSameWeek ? (stats?.weekly_xp ?? 0) + xpAwarded : xpAwarded;
 
-    const displayName =
-      user.user_metadata?.full_name?.trim() ||
-      user.user_metadata?.name?.trim() ||
-      (user.email ? user.email.split("@")[0] : null);
-
     await db
       .from("user_stats")
       .update({
@@ -92,7 +87,6 @@ export async function POST(request) {
         last_active_date: today,
         weekly_xp: newWeeklyXp,
         week_start_date: currentWeekStart,
-        ...(displayName ? { display_name: displayName } : {}),
       })
       .eq("user_id", user.id);
   }
