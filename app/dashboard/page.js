@@ -131,7 +131,7 @@ export default async function DashboardPage() {
               href="/pricing"
               className="bg-gradient-to-b from-gold-light to-gold text-[#241A02] text-base font-extrabold px-4 py-2.5 rounded-xl whitespace-nowrap flex items-center gap-1.5"
             >
-              Tarifs <ArrowRight size={16} />
+              Abonnement <ArrowRight size={16} />
             </Link>
           </div>
         )}
