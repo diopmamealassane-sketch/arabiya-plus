@@ -17,17 +17,38 @@ export default function LandingPage() {
   return (
     <main className="geo-bg min-h-screen">
       <div className="max-w-5xl mx-auto px-6 py-20">
-        <nav className="flex flex-col sm:flex-row items-center justify-between gap-5 sm:gap-6 mb-12 sm:mb-20">
-          <Link href="/">
-            <img src="/logo-mark.png" alt="Arabiya+" className="h-20 sm:h-32 w-auto object-contain" />
-          </Link>
-          <div className="flex flex-wrap justify-center items-center gap-x-5 gap-y-2 sm:gap-6 text-sm sm:text-base">
-            <Link href="/test-niveau" className="opacity-80 hover:opacity-100 whitespace-nowrap">Test de niveau</Link>
-            <Link href="/pricing" className="opacity-80 hover:opacity-100 whitespace-nowrap">Abonnement</Link>
-            <Link href="/login" className="opacity-80 hover:opacity-100 whitespace-nowrap">Se connecter</Link>
+        <nav className="mb-14 sm:mb-20">
+          {/* Barre utilitaire fine — mobile uniquement */}
+          <div className="flex sm:hidden justify-center items-center gap-x-3 text-[11px] uppercase tracking-widest text-gold-light/70 mb-6">
+            <Link href="/test-niveau" className="hover:text-gold-light transition-colors">Test de niveau</Link>
+            <span className="opacity-30">•</span>
+            <Link href="/pricing" className="hover:text-gold-light transition-colors">Abonnement</Link>
+            <span className="opacity-30">•</span>
+            <Link href="/login" className="hover:text-gold-light transition-colors">Se connecter</Link>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-6">
+            <Link href="/">
+              <img src="/logo-mark.png" alt="Arabiya+" className="h-24 sm:h-32 w-auto object-contain" />
+            </Link>
+
+            {/* Ligne complète — desktop uniquement */}
+            <div className="hidden sm:flex gap-6 items-center text-base">
+              <Link href="/test-niveau" className="opacity-80 hover:opacity-100">Test de niveau</Link>
+              <Link href="/pricing" className="opacity-80 hover:opacity-100">Abonnement</Link>
+              <Link href="/login" className="opacity-80 hover:opacity-100">Se connecter</Link>
+              <Link
+                href="/signup"
+                className="bg-gradient-to-b from-gold-light to-gold text-[#241A02] font-bold px-4 py-2 rounded-xl text-base"
+              >
+                Commencer
+              </Link>
+            </div>
+
+            {/* CTA seul, mis en avant — mobile uniquement */}
             <Link
               href="/signup"
-              className="bg-gradient-to-b from-gold-light to-gold text-[#241A02] font-bold px-4 py-2 rounded-xl text-sm sm:text-base whitespace-nowrap"
+              className="sm:hidden inline-flex items-center gap-2 bg-gradient-to-b from-gold-light to-gold text-[#241A02] font-bold px-9 py-3.5 rounded-2xl text-base shadow-lg shadow-gold/20"
             >
               Commencer
             </Link>
@@ -218,4 +239,4 @@ function Skill({ icon, title, subtitle }) {
       <p className="text-sm opacity-70 italic">{subtitle}</p>
     </div>
   );
-  }
+}
