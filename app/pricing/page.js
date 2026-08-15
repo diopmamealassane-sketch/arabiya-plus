@@ -33,7 +33,7 @@ export default function PricingPage() {
   return (
     <main className="geo-bg min-h-screen px-4 py-16">
       <div className="max-w-3xl mx-auto text-center">
-        <h1 className="text-3xl font-bold mb-2">Tarifs</h1>
+        <h1 className="text-3xl font-bold mb-2">Abonnement</h1>
         <p className="opacity-70 mb-3">
           30 jours d'essai gratuit sur tous les plans Premium — annulez à tout moment avant la fin de l'essai, sans frais.
         </p>
