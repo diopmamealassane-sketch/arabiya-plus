@@ -17,17 +17,17 @@ export default function LandingPage() {
   return (
     <main className="geo-bg min-h-screen">
       <div className="max-w-5xl mx-auto px-6 py-20">
-        <nav className="flex items-center justify-between mb-20">
+        <nav className="flex flex-col sm:flex-row items-center justify-between gap-5 sm:gap-6 mb-12 sm:mb-20">
           <Link href="/">
-            <img src="/logo-mark.png" alt="Arabiya+" className="h-28 sm:h-32 w-auto object-contain" />
+            <img src="/logo-mark.png" alt="Arabiya+" className="h-20 sm:h-32 w-auto object-contain" />
           </Link>
-          <div className="flex gap-6 items-center text-base">
-            <Link href="/test-niveau" className="opacity-80 hover:opacity-100">Test de niveau</Link>
-            <Link href="/pricing" className="opacity-80 hover:opacity-100">Tarifs</Link>
-            <Link href="/login" className="opacity-80 hover:opacity-100">Se connecter</Link>
+          <div className="flex flex-wrap justify-center items-center gap-x-5 gap-y-2 sm:gap-6 text-sm sm:text-base">
+            <Link href="/test-niveau" className="opacity-80 hover:opacity-100 whitespace-nowrap">Test de niveau</Link>
+            <Link href="/pricing" className="opacity-80 hover:opacity-100 whitespace-nowrap">Abonnement</Link>
+            <Link href="/login" className="opacity-80 hover:opacity-100 whitespace-nowrap">Se connecter</Link>
             <Link
               href="/signup"
-              className="bg-gradient-to-b from-gold-light to-gold text-[#241A02] font-bold px-4 py-2 rounded-xl text-base"
+              className="bg-gradient-to-b from-gold-light to-gold text-[#241A02] font-bold px-4 py-2 rounded-xl text-sm sm:text-base whitespace-nowrap"
             >
               Commencer
             </Link>
@@ -218,4 +218,4 @@ function Skill({ icon, title, subtitle }) {
       <p className="text-sm opacity-70 italic">{subtitle}</p>
     </div>
   );
-}
+  }
