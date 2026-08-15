@@ -46,7 +46,7 @@ export default function PricingPage() {
             <h2 className="font-bold text-lg mb-1">Gratuit</h2>
             <p className="text-2xl font-bold mb-4">0 €</p>
             <ul className="space-y-2 text-base">
-              <Item>7 premières unités du Cycle 1</Item>
+              <Item>5 premières unités du Cycle 1</Item>
               <Item>XP et série illimités</Item>
               <Item>1 révision par jour</Item>
             </ul>
