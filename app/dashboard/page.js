@@ -83,27 +83,29 @@ export default async function DashboardPage() {
       {/* Bannière */}
       <div className="bg-gradient-to-br from-ink to-ink-2 text-white px-5 pt-6 pb-11 relative overflow-hidden">
         <div className="flex items-center justify-between relative z-10">
-          <Link href="/" className="shrink-0 max-w-[45%]">
+          <Link href="/" className="shrink-0">
             <img
               src="/logo-mark.png"
               alt="Arabiya+"
-              className="h-32 w-auto max-w-full object-contain"
+              className="h-16 w-auto object-contain"
             />
           </Link>
-          <div className="flex gap-2.5">
-            <span className="bg-white/15 backdrop-blur rounded-full px-3.5 py-1.5 text-sm font-extrabold flex items-center gap-1.5">
-              <Flame size={16} /> {stats?.streak_count ?? 0} jours
-            </span>
-            <span className="bg-white/15 backdrop-blur rounded-full px-3.5 py-1.5 text-sm font-extrabold flex items-center gap-1.5">
-              <Star size={16} /> {stats?.xp_total ?? 0} XP
-            </span>
-            <Link
-              href="/leaderboard"
-              className="bg-white/15 backdrop-blur rounded-full px-3.5 py-1.5 text-sm font-extrabold flex items-center gap-1.5"
-            >
-              <Trophy size={16} />
-            </Link>
-          </div>
+          <Link
+            href="/leaderboard"
+            aria-label="Classement"
+            className="bg-white/15 backdrop-blur rounded-full w-10 h-10 flex items-center justify-center shrink-0"
+          >
+            <Trophy size={18} />
+          </Link>
+        </div>
+
+        <div className="relative z-10 mt-4 flex justify-center gap-2.5">
+          <span className="bg-white/15 backdrop-blur rounded-full px-3.5 py-1.5 text-sm font-extrabold flex items-center gap-1.5">
+            <Flame size={16} /> {stats?.streak_count ?? 0} jours
+          </span>
+          <span className="bg-white/15 backdrop-blur rounded-full px-3.5 py-1.5 text-sm font-extrabold flex items-center gap-1.5">
+            <Star size={16} /> {stats?.xp_total ?? 0} XP
+          </span>
         </div>
 
         <div className="relative z-10 mt-5">
