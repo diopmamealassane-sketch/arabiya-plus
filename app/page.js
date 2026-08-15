@@ -18,13 +18,26 @@ export default function LandingPage() {
     <main className="geo-bg min-h-screen">
       <div className="max-w-5xl mx-auto px-6 py-20">
         <nav className="mb-14 sm:mb-20">
-          {/* Barre utilitaire fine — mobile uniquement */}
-          <div className="flex sm:hidden justify-center items-center gap-x-3 text-[11px] uppercase tracking-widest text-gold-light/70 mb-6">
-            <Link href="/test-niveau" className="hover:text-gold-light transition-colors">Test de niveau</Link>
-            <span className="opacity-30">•</span>
-            <Link href="/pricing" className="hover:text-gold-light transition-colors">Abonnement</Link>
-            <span className="opacity-30">•</span>
-            <Link href="/login" className="hover:text-gold-light transition-colors">Se connecter</Link>
+          {/* Boutons-texte — mobile uniquement */}
+          <div className="flex sm:hidden flex-wrap justify-center items-center gap-2.5 mb-8">
+            <Link
+              href="/test-niveau"
+              className="text-xs font-semibold uppercase tracking-wide px-4 py-2 rounded-full border border-gold-light/30 text-gold-light/90 hover:bg-gold-light/10 transition-colors"
+            >
+              Test de niveau
+            </Link>
+            <Link
+              href="/pricing"
+              className="text-xs font-semibold uppercase tracking-wide px-4 py-2 rounded-full border border-gold-light/30 text-gold-light/90 hover:bg-gold-light/10 transition-colors"
+            >
+              Abonnement
+            </Link>
+            <Link
+              href="/login"
+              className="text-xs font-semibold uppercase tracking-wide px-4 py-2 rounded-full border border-gold-light/30 text-gold-light/90 hover:bg-gold-light/10 transition-colors"
+            >
+              Se connecter
+            </Link>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-6">
@@ -239,4 +252,4 @@ function Skill({ icon, title, subtitle }) {
       <p className="text-sm opacity-70 italic">{subtitle}</p>
     </div>
   );
-}
+  }
