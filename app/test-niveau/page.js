@@ -396,6 +396,9 @@ export default function PlacementTestPage() {
   const [selected, setSelected] = useState(null);
   const [typedAnswer, setTypedAnswer] = useState("");
   const [typedResult, setTypedResult] = useState(null); // null | true | false
+  const [email, setEmail] = useState("");
+  const [emailStatus, setEmailStatus] = useState("idle"); // idle | sending | sent | error
+  const [emailError, setEmailError] = useState("");
 
   if (!questions) {
     return (
@@ -451,6 +454,38 @@ export default function PlacementTestPage() {
     window.location.reload(); // régénère un nouveau tirage aléatoire
   }
 
+  async function handleSendEmail(e, reco) {
+    e.preventDefault();
+    if (!email || emailStatus === "sending" || emailStatus === "sent") return;
+    setEmailStatus("sending");
+    setEmailError("");
+    try {
+      const roadmap = CYCLES.map((cycle, i) => ({
+        label: CYCLE_LABELS[cycle],
+        mastered: i <= reco.confirmedIndex,
+        isStart: i === reco.startIndex,
+      }));
+      const res = await fetch("/api/send-placement-result", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          level: reco.level,
+          cycleLabel: reco.cycleLabel,
+          unit: reco.unit,
+          description: reco.description,
+          roadmap,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Échec de l'envoi. Réessayez.");
+      setEmailStatus("sent");
+    } catch (err) {
+      setEmailStatus("error");
+      setEmailError(err.message || "Échec de l'envoi. Réessayez.");
+    }
+  }
+
   if (done) {
     const reco = computeRecommendation(cycleStats);
     return (
@@ -497,6 +532,37 @@ export default function PlacementTestPage() {
               })}
             </div>
           </div>
+
+          <form onSubmit={(e) => handleSendEmail(e, reco)} className="text-left mb-6">
+            <label className="text-sm uppercase tracking-wide text-[#8a8264] font-semibold mb-2 block">
+              Recevoir ce résultat par email
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="email"
+                required
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={emailStatus === "sending" || emailStatus === "sent"}
+                placeholder="vous@exemple.com"
+                className="flex-1 min-w-0 border-2 border-black/15 rounded-xl px-3 py-2 text-sm disabled:opacity-60"
+              />
+              <button
+                type="submit"
+                disabled={emailStatus === "sending" || emailStatus === "sent"}
+                className="bg-ink text-white font-bold px-4 rounded-xl text-sm whitespace-nowrap disabled:opacity-50"
+              >
+                {emailStatus === "sending" ? "Envoi…" : emailStatus === "sent" ? "Envoyé ✓" : "Envoyer"}
+              </button>
+            </div>
+            {emailStatus === "sent" && (
+              <p className="text-sm text-teal mt-2 flex items-center gap-1">
+                <Check size={14} /> Résultat envoyé à {email}
+              </p>
+            )}
+            {emailStatus === "error" && <p className="text-sm text-[#8C3327] mt-2">{emailError}</p>}
+          </form>
 
           <Link
             href="/signup"
