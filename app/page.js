@@ -42,7 +42,7 @@ export default function LandingPage() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-6">
             <Link href="/">
-              <img src="/logo-mark.png" alt="Arabiya+" className="h-24 sm:h-32 w-auto object-contain" />
+              <img src="/logo-mark.png" alt="Arabiya+" className="h-32 sm:h-32 w-auto object-contain" />
             </Link>
 
             {/* Ligne complète — desktop uniquement */}
