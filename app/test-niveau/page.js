@@ -22,6 +22,34 @@ const WORD_BANK = {
     { ar: "أَحْمَر", fr: "rouge", typeable: true },
     { ar: "خُبْز", fr: "pain", typeable: true },
     { ar: "بَيْت", fr: "maison", typeable: true },
+    { ar: "أُمّ", fr: "mère", typeable: true },
+    { ar: "أَخ", fr: "frère", typeable: true },
+    { ar: "أُخْت", fr: "sœur", typeable: true },
+    { ar: "اِثْنَان", fr: "deux", typeable: true },
+    { ar: "ثَلَاثَة", fr: "trois", typeable: true },
+    { ar: "أَرْبَعَة", fr: "quatre", typeable: true },
+    { ar: "خَمْسَة", fr: "cinq", typeable: true },
+    { ar: "أَزْرَق", fr: "bleu", typeable: true },
+    { ar: "أَخْضَر", fr: "vert", typeable: true },
+    { ar: "أَصْفَر", fr: "jaune", typeable: true },
+    { ar: "مَاء", fr: "eau", typeable: true },
+    { ar: "حَلِيب", fr: "lait", typeable: true },
+    { ar: "تُفَّاح", fr: "pomme", typeable: true },
+    { ar: "مَدْرَسَة", fr: "école", typeable: true },
+    { ar: "كِتَاب", fr: "livre", typeable: true },
+    { ar: "قَلَم", fr: "stylo", typeable: true },
+    { ar: "بَاب", fr: "porte", typeable: true },
+    { ar: "شَمْس", fr: "soleil", typeable: true },
+    { ar: "قَمَر", fr: "lune", typeable: true },
+    { ar: "يَوْم", fr: "jour", typeable: true },
+    { ar: "لَيْلَة", fr: "nuit", typeable: true },
+    { ar: "صَبَاح الخَيْر", fr: "bonjour (le matin)", typeable: true },
+    { ar: "مَسَاء الخَيْر", fr: "bonsoir", typeable: true },
+    { ar: "شُكْرًا", fr: "merci", typeable: true },
+    { ar: "مِن فَضْلِك", fr: "s'il te plaît", typeable: true },
+    { ar: "نَعَم", fr: "oui", typeable: true },
+    { ar: "لَا", fr: "non", typeable: true },
+    { ar: "اِسْم", fr: "nom", typeable: true },
   ],
   A2: [
     { ar: "أَنَا", fr: "je / moi", typeable: true },
@@ -30,22 +58,103 @@ const WORD_BANK = {
     { ar: "مَرِيض", fr: "malade", typeable: true },
     { ar: "طَوِيل", fr: "grand (une personne)", typeable: true },
     { ar: "إِنْتِرْنِت", fr: "internet", typeable: true },
+    { ar: "أَمْس", fr: "hier", typeable: true },
+    { ar: "اليَوْم", fr: "aujourd'hui", typeable: true },
+    { ar: "غَدًا", fr: "demain", typeable: true },
+    { ar: "مَتَى", fr: "quand", typeable: true },
+    { ar: "أَيْنَ", fr: "où", typeable: true },
+    { ar: "كَيْف", fr: "comment", typeable: true },
+    { ar: "كَم", fr: "combien", typeable: true },
+    { ar: "مَحَطَّة القِطَار", fr: "gare", typeable: true },
+    { ar: "فُنْدُق", fr: "hôtel", typeable: true },
+    { ar: "مُسْتَشْفَى", fr: "hôpital", typeable: true },
+    { ar: "صَيْدَلِيَّة", fr: "pharmacie", typeable: true },
+    { ar: "مَطْعَم", fr: "restaurant", typeable: true },
+    { ar: "سُوق", fr: "marché", typeable: true },
+    { ar: "نُقُود", fr: "argent", typeable: true },
+    { ar: "بِطَاقَة", fr: "carte", typeable: true },
+    { ar: "تَذْكِرَة", fr: "billet", typeable: true },
+    { ar: "رِحْلَة", fr: "voyage", typeable: true },
+    { ar: "عَائِلَة", fr: "famille", typeable: true },
+    { ar: "صَدِيق", fr: "ami", typeable: true },
+    { ar: "عَمَل", fr: "travail", typeable: true },
+    { ar: "مُدِير", fr: "directeur", typeable: true },
+    { ar: "مُوَظَّف", fr: "employé", typeable: true },
+    { ar: "اِجْتِمَاع", fr: "réunion", typeable: true },
+    { ar: "طَقْس", fr: "météo", typeable: true },
+    { ar: "مُمْطِر", fr: "pluvieux", typeable: true },
+    { ar: "مُشْمِس", fr: "ensoleillé", typeable: true },
+    { ar: "بَارِد", fr: "froid", typeable: true },
   ],
   B1: [
-    { ar: "سَأَذْهَب غَدًا", fr: "j'irai demain", typeable: false },
-    { ar: "فِي رَأْيِي", fr: "à mon avis", typeable: false },
+    { ar: "سَأَذْهَب غَدًا", fr: "j'irai demain", typeable: true },
+    { ar: "فِي رَأْيِي", fr: "à mon avis", typeable: true },
     { ar: "لَوْ كُنْتُ غَنِيًّا", fr: "si j'étais riche", typeable: false },
     { ar: "صَحَفِيّ", fr: "journaliste", typeable: true },
-    { ar: "مُقَابَلَة عَمَل", fr: "entretien d'embauche", typeable: false },
-    { ar: "وَاجِب مَنْزِلِيّ", fr: "devoir (à la maison)", typeable: false },
+    { ar: "مُقَابَلَة عَمَل", fr: "entretien d'embauche", typeable: true },
+    { ar: "وَاجِب مَنْزِلِيّ", fr: "devoir (à la maison)", typeable: true },
+    { ar: "لَقَدْ ذَهَبْتُ", fr: "je suis allé", typeable: true },
+    { ar: "كُنْتُ أَعْمَل", fr: "je travaillais", typeable: true },
+    { ar: "سَوْفَ أُسَافِر", fr: "je voyagerai", typeable: true },
+    { ar: "يَجِب أَن", fr: "il faut que", typeable: true },
+    { ar: "مِن المُمْكِن أَن", fr: "il est possible que", typeable: false },
+    { ar: "أَعْتَقِد أَنَّ", fr: "je pense que", typeable: true },
+    { ar: "بِالنِّسْبَة لِي", fr: "en ce qui me concerne", typeable: false },
+    { ar: "عَلَى الرَّغْم مِن", fr: "bien que / malgré", typeable: false },
+    { ar: "مُنْذُ سَنَتَيْن", fr: "il y a deux ans", typeable: false },
+    { ar: "تَخَرَّجْتُ", fr: "j'ai obtenu mon diplôme", typeable: true },
+    { ar: "اِسْتَقَلْتُ", fr: "j'ai démissionné", typeable: true },
+    { ar: "تَرْقِيَة", fr: "promotion", typeable: true },
+    { ar: "رَاتِب", fr: "salaire", typeable: true },
+    { ar: "عَقْد عَمَل", fr: "contrat de travail", typeable: true },
+    { ar: "إِجَازَة", fr: "congé", typeable: true },
+    { ar: "مَوْعِد طِبِّيّ", fr: "rendez-vous médical", typeable: true },
+    { ar: "أَعْرَاض", fr: "symptômes", typeable: true },
+    { ar: "وَصْفَة طِبِّيَّة", fr: "ordonnance", typeable: true },
+    { ar: "تَأْمِين صِحِّيّ", fr: "assurance maladie", typeable: false },
+    { ar: "خِبْرَة", fr: "expérience", typeable: true },
+    { ar: "مَهَارَة", fr: "compétence", typeable: true },
+    { ar: "هَدَف", fr: "objectif", typeable: true },
+    { ar: "تَحَدٍّ", fr: "défi", typeable: true },
+    { ar: "حَلّ", fr: "solution", typeable: true },
+    { ar: "مُشْكِلَة", fr: "problème", typeable: true },
+    { ar: "قَرَار", fr: "décision", typeable: true },
+    { ar: "فُرْصَة", fr: "opportunité", typeable: true },
   ],
   B2: [
     { ar: "كُتِبَ", fr: "a été écrit", typeable: true },
     { ar: "قَالَ إِنَّهُ سَيَأْتِي", fr: "il a dit qu'il viendrait", typeable: false },
     { ar: "الرَّجُل الَّذِي يَعْمَل هُنَا", fr: "l'homme qui travaille ici", typeable: false },
     { ar: "بِالرَّغْم مِنْ ذَلِك", fr: "malgré cela", typeable: false },
-    { ar: "تَغَيُّر المُنَاخ", fr: "le changement climatique", typeable: false },
-    { ar: "الذَّكَاء الاِصْطِنَاعِيّ", fr: "l'intelligence artificielle", typeable: false },
+    { ar: "تَغَيُّر المُنَاخ", fr: "le changement climatique", typeable: true },
+    { ar: "الذَّكَاء الاِصْطِنَاعِيّ", fr: "l'intelligence artificielle", typeable: true },
+    { ar: "اِقْتِصَاد", fr: "économie", typeable: true },
+    { ar: "سِيَاسَة", fr: "politique", typeable: true },
+    { ar: "دِيمُقْرَاطِيَّة", fr: "démocratie", typeable: true },
+    { ar: "اِنْتِخَابَات", fr: "élections", typeable: true },
+    { ar: "حُكُومَة", fr: "gouvernement", typeable: true },
+    { ar: "بَرْلَمَان", fr: "parlement", typeable: true },
+    { ar: "قَانُون", fr: "loi", typeable: true },
+    { ar: "عَدَالَة", fr: "justice", typeable: true },
+    { ar: "حَقّ الإِنْسَان", fr: "droit de l'homme", typeable: false },
+    { ar: "مُجْتَمَع", fr: "société", typeable: true },
+    { ar: "ثَقَافَة", fr: "culture", typeable: true },
+    { ar: "تَقَالِيد", fr: "traditions", typeable: true },
+    { ar: "هُوِيَّة", fr: "identité", typeable: true },
+    { ar: "تَنَوُّع", fr: "diversité", typeable: true },
+    { ar: "عَوْلَمَة", fr: "mondialisation", typeable: true },
+    { ar: "تَنْمِيَة مُسْتَدَامَة", fr: "développement durable", typeable: false },
+    { ar: "طَاقَة مُتَجَدِّدَة", fr: "énergie renouvelable", typeable: false },
+    { ar: "تَلَوُّث", fr: "pollution", typeable: true },
+    { ar: "اِنْبِعَاثَات", fr: "émissions", typeable: true },
+    { ar: "أَزْمَة", fr: "crise", typeable: true },
+    { ar: "تَضَخُّم", fr: "inflation", typeable: true },
+    { ar: "بَطَالَة", fr: "chômage", typeable: true },
+    { ar: "اِسْتِثْمَار", fr: "investissement", typeable: true },
+    { ar: "مُنَافَسَة", fr: "concurrence", typeable: true },
+    { ar: "اِبْتِكَار", fr: "innovation", typeable: true },
+    { ar: "رِيَادَة الأَعْمَال", fr: "entrepreneuriat", typeable: false },
+    { ar: "اِسْتِدَامَة", fr: "durabilité", typeable: true },
   ],
   C1: [
     { ar: "تَشَرَّفْنَا", fr: "enchanté (formel)", typeable: true },
@@ -54,6 +163,33 @@ const WORD_BANK = {
     { ar: "مُفَاوَضَات ثُنَائِيَّة", fr: "négociations bilatérales", typeable: false },
     { ar: "اِسْتِعَارَة", fr: "métaphore", typeable: true },
     { ar: "فَلْسَفَة", fr: "philosophie", typeable: true },
+    { ar: "مُفَارَقَة", fr: "paradoxe", typeable: true },
+    { ar: "تَنَاقُض", fr: "contradiction", typeable: true },
+    { ar: "جَدَل", fr: "controverse", typeable: true },
+    { ar: "إِقْنَاع", fr: "persuasion", typeable: true },
+    { ar: "حُجَّة", fr: "argument", typeable: true },
+    { ar: "اِسْتِنْتَاج", fr: "déduction", typeable: true },
+    { ar: "اِفْتِرَاض", fr: "hypothèse", typeable: true },
+    { ar: "مَنْطِق", fr: "logique", typeable: true },
+    { ar: "تَحْلِيل نَقْدِيّ", fr: "analyse critique", typeable: false },
+    { ar: "مَنْهَجِيَّة", fr: "méthodologie", typeable: true },
+    { ar: "اِسْتِقْرَاء", fr: "induction", typeable: true },
+    { ar: "تَجْرِيد", fr: "abstraction", typeable: true },
+    { ar: "تَأْوِيل", fr: "interprétation", typeable: true },
+    { ar: "سِيَاق", fr: "contexte", typeable: true },
+    { ar: "دَلَالَة", fr: "signification / sémantique", typeable: true },
+    { ar: "بَلَاغِيّ", fr: "rhétorique (adj.)", typeable: true },
+    { ar: "أُسْلُوب", fr: "style", typeable: true },
+    { ar: "نَبْرَة", fr: "ton", typeable: true },
+    { ar: "إِيقَاع", fr: "rythme", typeable: true },
+    { ar: "رَمْزِيَّة", fr: "symbolisme", typeable: true },
+    { ar: "تَنَاصّ", fr: "intertextualité", typeable: true },
+    { ar: "نَقْد أَدَبِيّ", fr: "critique littéraire", typeable: false },
+    { ar: "مُصْطَلَح", fr: "terme / concept", typeable: true },
+    { ar: "إِشْكَالِيَّة", fr: "problématique", typeable: true },
+    { ar: "تَصَوُّر", fr: "conception / représentation", typeable: true },
+    { ar: "تَفْكِيك", fr: "déconstruction", typeable: true },
+    { ar: "تَرَابُط", fr: "cohérence", typeable: true },
   ],
   C2: [
     { ar: "لَهْجَة", fr: "dialecte", typeable: true },
@@ -62,8 +198,43 @@ const WORD_BANK = {
     { ar: "جَذْر ثُلَاثِيّ", fr: "racine trilitère", typeable: false },
     { ar: "صَحَافَة اِسْتِقْصَائِيَّة", fr: "journalisme d'investigation", typeable: false },
     { ar: "البَلَاغَة", fr: "l'éloquence", typeable: true },
+    { ar: "فُصْحَى", fr: "arabe littéraire", typeable: true },
+    { ar: "عَامِّيَّة", fr: "dialecte familier", typeable: true },
+    { ar: "اِزْدِوَاجِيَّة لُغَوِيَّة", fr: "diglossie", typeable: false },
+    { ar: "صَرْف", fr: "morphologie", typeable: true },
+    { ar: "نَحْو", fr: "syntaxe / grammaire", typeable: true },
+    { ar: "عَرُوض", fr: "métrique / prosodie", typeable: true },
+    { ar: "قَافِيَة", fr: "rime", typeable: true },
+    { ar: "بَحْر شِعْرِيّ", fr: "mètre poétique", typeable: false },
+    { ar: "مَقَامَة", fr: "maqama (genre littéraire)", typeable: true },
+    { ar: "أَدَب جَاهِلِيّ", fr: "littérature préislamique", typeable: false },
+    { ar: "تُرَاث", fr: "patrimoine", typeable: true },
+    { ar: "مَخْطُوطَة", fr: "manuscrit", typeable: true },
+    { ar: "تَحْقِيق نَصِّيّ", fr: "édition critique de texte", typeable: false },
+    { ar: "اِسْتِشْرَاق", fr: "orientalisme", typeable: true },
+    { ar: "مُسْتَعْرِب", fr: "arabisant", typeable: true },
+    { ar: "اِزْدِهَار حَضَارِيّ", fr: "épanouissement civilisationnel", typeable: false },
+    { ar: "فِقْه اللُّغَة", fr: "philologie", typeable: false },
+    { ar: "سِيَاسَة لُغَوِيَّة", fr: "politique linguistique", typeable: false },
+    { ar: "تَعْرِيب", fr: "arabisation", typeable: true },
+    { ar: "تَقْعِيد", fr: "normalisation / codification", typeable: true },
+    { ar: "مُوَلَّد", fr: "néologisme", typeable: true },
+    { ar: "مُعَرَّب", fr: "mot arabisé (emprunt)", typeable: true },
+    { ar: "اِشْتِقَاق", fr: "dérivation", typeable: true },
+    { ar: "جِنَاس", fr: "jeu de mots (paronomase)", typeable: true },
+    { ar: "طِبَاق", fr: "antithèse", typeable: true },
+    { ar: "اِسْتِطْرَاد", fr: "digression", typeable: true },
+    { ar: "حِجَاج", fr: "argumentation rhétorique", typeable: true },
+    { ar: "بَيَان", fr: "clarté d'expression / rhétorique", typeable: true },
   ],
 };
+
+// Nombre de questions objectives tirées au sort par cycle à chaque
+// passage du test (le test garde 42 questions au total : 6 cycles ×
+// 6 questions + 6 questions d'auto-évaluation). La banque ci-dessus
+// est bien plus grande (200 mots/expressions) pour que chaque passage
+// tire un échantillon différent et ne puisse pas être mémorisé.
+const QUESTIONS_PER_CYCLE = 6;
 
 const CYCLES = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
@@ -105,7 +276,7 @@ const SELF_OPTIONS = [
   { label: "Tout à fait", points: 3 },
 ];
 
-const MASTERY_THRESHOLD = 0.65;
+const MASTERY_THRESHOLD = 0.8;
 
 function shuffle(arr) {
   const a = [...arr];
@@ -119,19 +290,32 @@ function sample(arr, n) {
   return shuffle(arr).slice(0, n);
 }
 
+// Répartition cible des 6 questions objectives tirées par cycle :
+// 4 questions de production (dictée en arabe / "comment dit-on en
+// arabe") pour 2 questions à choix multiples (QCM), au lieu du 2/2/2
+// précédent. La production ne peut pas se deviner au hasard — c'est
+// ce qui empêche un niveau B1 de se retrouver classé C1/C2 par chance.
+const KIND_PLAN = ["type_ar", "type_ar", "mcq_fr_to_ar", "type_ar", "type_ar", "mcq_ar_to_fr"];
+
 // Construit le test : pour chaque cycle (A1 → C2, du plus facile au
-// plus dur), 6 questions objectives tirées du vrai vocabulaire du
-// cycle, puis les 6 questions d'auto-évaluation à la fin.
+// plus dur), on tire au hasard QUESTIONS_PER_CYCLE mots dans la banque
+// (200 au total) puis on leur applique le plan de répartition
+// ci-dessus, avant les 6 questions d'auto-évaluation à la fin. Comme
+// l'échantillon change à chaque passage, le test ne peut pas être
+// mémorisé ni deviné d'une tentative à l'autre.
 function buildTest() {
   const objective = [];
   CYCLES.forEach((cycle) => {
-    const words = shuffle(WORD_BANK[cycle]);
+    const pool = WORD_BANK[cycle];
+    const words = sample(pool, Math.min(QUESTIONS_PER_CYCLE, pool.length));
+
     words.forEach((w, i) => {
-      const kindPool = w.typeable
-        ? ["type_ar", "mcq_ar_to_fr", "mcq_fr_to_ar"]
-        : ["mcq_ar_to_fr", "mcq_fr_to_ar"];
-      const kind = kindPool[i % kindPool.length];
-      const distractorPool = words.filter((x) => x.ar !== w.ar);
+      let kind = KIND_PLAN[i % KIND_PLAN.length];
+      // Un mot/expression non "typeable" (trop long à saisir) retombe
+      // sur la version QCM de la même direction de production.
+      if (kind === "type_ar" && !w.typeable) kind = "mcq_fr_to_ar";
+
+      const distractorPool = pool.filter((x) => x.ar !== w.ar);
 
       if (kind === "type_ar") {
         objective.push({ kind, cycle, prompt: w.fr, answer: w.ar });
@@ -223,7 +407,7 @@ export default function PlacementTestPage() {
 
   const done = index >= questions.length;
   const current = !done ? questions[index] : null;
-  const objectiveCount = CYCLES.length * 6;
+  const objectiveCount = CYCLES.length * QUESTIONS_PER_CYCLE;
 
   function advance() {
     setSelected(null);
