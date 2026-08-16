@@ -87,7 +87,7 @@ export default async function DashboardPage() {
             <img
               src="/logo-mark.png"
               alt="Arabiya+"
-              className="h-16 w-auto object-contain"
+              className="h-24 w-auto object-contain"
             />
           </Link>
           <Link
