@@ -1,7 +1,7 @@
 import Link from "next/link";
 import {
   ArrowRight, Volume2, Repeat, Trophy, Target, Mic, Award, Sparkles,
-  Headphones, BookOpen, PenLine,
+  Headphones, BookOpen, PenLine, Lock, Check,
 } from "lucide-react";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 
@@ -111,6 +111,9 @@ export default async function LandingPage() {
             et certificats à chaque étape. Une méthode complète, pensée pour
             les francophones.
           </p>
+          <p className="text-sm text-gold-light font-semibold mb-3">
+            Vous connaissez déjà l'arabe ? Notre test vous dit exactement où reprendre.
+          </p>
           <Link
             href="/test-niveau"
             className="inline-flex items-center gap-2 bg-gradient-to-b from-gold-light to-gold text-[#241A02] font-bold px-8 py-4 rounded-2xl"
@@ -119,8 +122,16 @@ export default async function LandingPage() {
           </Link>
           <div className="mt-4">
             <Link href="/signup" className="text-base underline opacity-70 hover:opacity-100">
-              Ou commencez directement, gratuitement
+              Débutant complet ? Commencez directement, gratuitement
             </Link>
+          </div>
+
+          {/* Réassurance — répond directement à la friction "carte demandée à l'essai" */}
+          <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 mt-8 text-sm opacity-60">
+            <span className="flex items-center gap-1.5"><Lock size={14} /> Paiement sécurisé</span>
+            <span className="flex items-center gap-1.5"><Check size={14} /> Sans engagement</span>
+            <span className="flex items-center gap-1.5"><Check size={14} /> Annulation à tout moment</span>
+            <span className="flex items-center gap-1.5"><Check size={14} /> Accès immédiat</span>
           </div>
         </div>
 
