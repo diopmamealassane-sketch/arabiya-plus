@@ -226,6 +226,33 @@ export default async function LandingPage() {
           </div>
         </div>
 
+        {/* Aperçu du niveau avancé — contenu réel, pas une promesse abstraite */}
+        <div className="mt-24">
+          <p className="text-gold-light uppercase tracking-widest text-sm font-semibold text-center mb-3">
+            La promesse C1 → C2, concrètement
+          </p>
+          <h2 className="text-3xl font-bold text-center mb-4">
+            Ce n'est pas juste "beaucoup de leçons"
+          </h2>
+          <p className="text-center opacity-70 max-w-xl mx-auto mb-12">
+            Au niveau C1, vous négociez, débattez et présentez à l'oral sur des
+            sujets réels : négociation, rhétorique, présentation académique,
+            philosophie, géopolitique. Le C2 vous mène jusqu'à l'éloquence.
+          </p>
+
+          <div className="bg-ink-2/60 border border-gold/20 rounded-2xl p-8 max-w-2xl mx-auto text-center">
+            <p className="text-xs uppercase tracking-widest text-gold-light font-semibold mb-4">
+              Extrait — Leçon de synthèse finale, Cycle C2
+            </p>
+            <p className="arabic text-3xl mb-3" dir="rtl">
+              أَسْتَطِيعُ الآنَ التَّعْبِيرَ عَنْ نَفْسِي بِبَلَاغَةٍ وَثِقَةٍ فِي اللُّغَةِ العَرَبِيَّةِ
+            </p>
+            <p className="opacity-70 italic">
+              « Je peux maintenant m'exprimer avec éloquence et confiance en arabe. »
+            </p>
+          </div>
+        </div>
+
         {/* Preuves — n'apparaît que si les chiffres réels sont assez significatifs */}
         {stats.leconsCompletees >= 50 && (
           <div className="mt-24">
