@@ -77,12 +77,13 @@ export default function LandingPage() {
             مَرْحَبًا بِكَ
           </h1>
           <p className="text-2xl font-semibold mb-4">
-            La seule méthode d'arabe qui vous mène vraiment jusqu'à la maîtrise.
+            Apprenez l'arabe. De A1 à C2.
           </p>
           <p className="opacity-80 mb-10">
-            Pas juste les bases : un parcours complet en 6 niveaux (A1 à C2),
+            669 leçons pour apprendre, pratiquer et progresser à votre rythme —
             avec audio natif, reconnaissance vocale, révisions intelligentes
-            et certificats à chaque étape.
+            et certificats à chaque étape. Une méthode complète, pensée pour
+            les francophones.
           </p>
           <Link
             href="/test-niveau"
@@ -105,6 +106,26 @@ export default function LandingPage() {
           <Stat value="100%" label="pensé pour les francophones" />
         </div>
 
+        {/* Différenciateurs forts — reconnaissance vocale + révision intelligente */}
+        <div className="mt-24 grid md:grid-cols-2 gap-6">
+          <div className="bg-ink-2/60 border border-gold/20 rounded-2xl p-8">
+            <div className="text-gold-light mb-4"><Mic size={32} /></div>
+            <h3 className="text-xl font-bold mb-2">🎤 Parlez arabe</h3>
+            <p className="opacity-80">
+              Prononcez à voix haute, enregistrez-vous, obtenez votre score
+              instantané et améliorez votre prononciation — pas seulement des QCM.
+            </p>
+          </div>
+          <div className="bg-ink-2/60 border border-gold/20 rounded-2xl p-8">
+            <div className="text-gold-light mb-4"><Repeat size={32} /></div>
+            <h3 className="text-xl font-bold mb-2">🧠 Votre révision quotidienne, automatique</h3>
+            <p className="opacity-80">
+              Arabiya+ sélectionne pour vous ce que vous devez réviser chaque
+              jour, juste avant que vous ne l'oubliiez.
+            </p>
+          </div>
+        </div>
+
         {/* Grille de fonctionnalités */}
         <div className="mt-24">
           <p className="text-gold-light uppercase tracking-widest text-sm font-semibold text-center mb-3">
@@ -117,11 +138,11 @@ export default function LandingPage() {
             <Feature icon={<Target />} title="Test de niveau précis">
               42 questions couvrant les 6 niveaux du CECRL — un vrai résultat, pas une estimation, avec votre feuille de route personnalisée.
             </Feature>
-            <Feature icon={<Mic />} title="Reconnaissance vocale">
-              Prononcez à voix haute et obtenez un score instantané — pas seulement des QCM.
+            <Feature icon={<BookOpen />} title="Pensé pour les francophones">
+              Grammaire expliquée en français, pièges classiques anticipés dès le départ — pas la traduction d'un cours pensé pour l'anglais.
             </Feature>
-            <Feature icon={<Repeat />} title="Révision intelligente">
-              Un système de répétition espacée fait ressurgir chaque mot juste avant que vous ne l'oubliiez.
+            <Feature icon={<Volume2 />} title="Audio natif sur chaque mot">
+              Chaque mot et chaque phrase sont prononcés par une voix arabe native, pour un apprentissage à l'oreille dès le premier jour.
             </Feature>
             <Feature icon={<Trophy />} title="Classement hebdomadaire">
               Comparez votre progression aux autres apprenants et grimpez dans le classement chaque semaine.
