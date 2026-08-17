@@ -76,13 +76,15 @@ export default function PricingPage() {
                 }`}
               >
                 <span className="absolute -top-2.5 right-3 bg-gold text-[#241A02] text-xs font-black px-2 py-0.5 rounded-full">
-                  -15%
+                  -25% · Meilleure offre
                 </span>
                 <div className="flex items-center justify-between">
                   <span className="font-semibold">Annuel</span>
-                  <span className="font-bold">101,90 € / an</span>
+                  <span className="font-bold">89,90 € / an</span>
                 </div>
-                <p className="text-sm opacity-60 mt-1">soit 8,49 € / mois</p>
+                <p className="text-sm opacity-60 mt-1">
+                  soit 7,49 € / mois — économisez 30 € / an vs mensuel
+                </p>
               </button>
             </div>
 
