@@ -163,6 +163,36 @@ export default async function LandingPage() {
           </div>
         </div>
 
+        {/* Aperçu produit — mockup léger en code, pas une simple description textuelle */}
+        <div className="mt-24">
+          <p className="text-gold-light uppercase tracking-widest text-sm font-semibold text-center mb-3">
+            Voyez plutôt
+          </p>
+          <h2 className="text-3xl font-bold text-center mb-12">
+            À quoi ressemble un exercice de prononciation
+          </h2>
+
+          <div className="max-w-xs mx-auto bg-gradient-to-b from-ink to-ink-2 border border-gold/30 rounded-[2rem] p-6 shadow-2xl">
+            <p className="text-xs uppercase tracking-widest text-gold-light/70 font-semibold text-center mb-6">
+              Leçon 3 · Se saluer
+            </p>
+            <p className="arabic text-5xl text-center mb-2" dir="rtl">مرحباً</p>
+            <p className="text-center text-sm opacity-60 mb-1">marhaban</p>
+            <p className="text-center text-sm opacity-60 mb-8">bonjour</p>
+
+            <div className="flex justify-center mb-6">
+              <div className="w-16 h-16 rounded-full bg-gold/20 border-2 border-gold-light flex items-center justify-center">
+                <Mic size={26} className="text-gold-light" />
+              </div>
+            </div>
+
+            <div className="bg-white/10 rounded-xl p-4 text-center">
+              <p className="text-3xl font-black text-gold-light mb-1">87%</p>
+              <p className="text-sm font-semibold opacity-80">Excellent !</p>
+            </div>
+          </div>
+        </div>
+
         {/* Grille de fonctionnalités */}
         <div className="mt-24">
           <p className="text-gold-light uppercase tracking-widest text-sm font-semibold text-center mb-3">
