@@ -26,6 +26,11 @@ export default function SignupPage() {
           full_name: fullName.trim(),
           display_name: displayName.trim(),
         },
+        // Sans ceci, le lien de confirmation renvoie vers l'URL "Site URL"
+        // par défaut configurée dans Supabase (probablement la page
+        // d'accueil) au lieu du dashboard — un clic perdu de plus dans
+        // le funnel inscription → première leçon.
+        emailRedirectTo: `${window.location.origin}/dashboard`,
       },
     });
     setLoading(false);
@@ -41,8 +46,14 @@ export default function SignupPage() {
       <main className="geo-bg min-h-screen flex items-center justify-center px-4">
         <div className="bg-parchment text-ink rounded-2xl p-8 w-full max-w-sm text-center float-in">
           <h1 className="text-xl font-bold mb-3">Vérifiez votre email</h1>
-          <p className="text-base opacity-70">
-            Un lien de confirmation vient de vous être envoyé. Cliquez dessus pour activer votre compte.
+          <p className="text-base opacity-70 mb-4">
+            Un lien de confirmation vient de vous être envoyé à <strong>{email}</strong>.
+            Cliquez dessus pour activer votre compte et accéder directement à votre parcours.
+          </p>
+          <p className="text-sm opacity-60">
+            Vous ne le voyez pas ? Vérifiez vos <strong>spams / courriers indésirables</strong> —
+            ou <Link href="/login" className="underline">réessayez de vous connecter</Link> dans
+            quelques minutes.
           </p>
         </div>
       </main>
