@@ -1,13 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Check } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function PricingPage() {
+  const supabase = createClient();
   const [loading, setLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("annual");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setIsLoggedIn(!!user);
+    });
+  }, [supabase]);
+
+  const [skipTrial, setSkipTrial] = useState(false);
 
   async function handleUpgrade(plan) {
     if (!acceptedTerms) return;
@@ -15,7 +26,7 @@ export default function PricingPage() {
     const res = await fetch("/api/create-checkout-session", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ plan }),
+      body: JSON.stringify({ plan, skipTrial }),
     });
     if (res.status === 401) {
       window.location.href = "/login";
@@ -35,10 +46,10 @@ export default function PricingPage() {
       <div className="max-w-3xl mx-auto text-center">
         <h1 className="text-3xl font-bold mb-2">Abonnement</h1>
         <p className="opacity-70 mb-3">
-          30 jours d'essai gratuit sur tous les plans Premium — annulez à tout moment avant la fin de l'essai, sans frais.
+          30 jours d'essai gratuit sur tous les plans Premium — ou démarrez directement, sans essai, si vous préférez.
         </p>
         <p className="text-sm opacity-50 mb-12">
-          Une carte bancaire est demandée à l'inscription pour activer l'essai, mais vous n'êtes prélevé qu'à son terme.
+          Avec l'essai : une carte bancaire est demandée à l'inscription, mais vous n'êtes prélevé qu'à son terme.
         </p>
 
         <div className="grid md:grid-cols-2 gap-6 text-left mb-8">
@@ -51,16 +62,39 @@ export default function PricingPage() {
               <Item>1 révision par jour</Item>
             </ul>
             <Link
-              href="/signup"
+              href={isLoggedIn ? "/dashboard" : "/signup"}
               className="block text-center w-full border-2 border-ink/20 font-bold py-3 rounded-xl hover:bg-ink/5 transition"
             >
-              Continuer avec l'offre gratuite
+              {isLoggedIn ? "Continuer vers mon parcours" : "Continuer avec l'offre gratuite"}
             </Link>
           </div>
 
           <div className="bg-ink-2 border-2 border-gold rounded-2xl p-6">
             <h2 className="font-bold text-lg mb-1 text-gold-light">Premium</h2>
-            <p className="text-base text-gold-light font-semibold mb-4">30 jours offerts, puis :</p>
+
+            {/* Choix essai gratuit vs paiement immédiat */}
+            <div className="flex gap-2 mb-4 text-sm">
+              <button
+                onClick={() => setSkipTrial(false)}
+                className={`flex-1 py-2 rounded-lg font-semibold transition ${
+                  !skipTrial ? "bg-gold text-[#241A02]" : "bg-white/5 opacity-60"
+                }`}
+              >
+                30 jours d'essai
+              </button>
+              <button
+                onClick={() => setSkipTrial(true)}
+                className={`flex-1 py-2 rounded-lg font-semibold transition ${
+                  skipTrial ? "bg-gold text-[#241A02]" : "bg-white/5 opacity-60"
+                }`}
+              >
+                Sans essai, payer maintenant
+              </button>
+            </div>
+
+            <p className="text-base text-gold-light font-semibold mb-4">
+              {skipTrial ? "Facturation immédiate :" : "30 jours offerts, puis :"}
+            </p>
 
             <div className="space-y-2 mb-5">
               <button
@@ -114,7 +148,7 @@ export default function PricingPage() {
                 <Link href="/cgv" target="_blank" className="underline text-gold-light hover:opacity-100">
                   Conditions Générales de Vente
                 </Link>{" "}
-                et je demande l'exécution immédiate du service dès la fin de l'essai gratuit, ce qui entraîne ma renonciation expresse à mon droit de rétractation dès l'accès au contenu Premium (
+                et je demande l'exécution immédiate du service {skipTrial ? "dès le paiement" : "dès la fin de l'essai gratuit"}, ce qui entraîne ma renonciation expresse à mon droit de rétractation dès l'accès au contenu Premium (
                 <Link href="/cgv#article-7" target="_blank" className="underline text-gold-light hover:opacity-100">
                   Article 7
                 </Link>
@@ -127,7 +161,7 @@ export default function PricingPage() {
               disabled={loading || !acceptedTerms}
               className="w-full bg-gradient-to-b from-gold-light to-gold text-[#241A02] font-bold py-3 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Redirection…" : "Démarrer l'essai gratuit"}
+              {loading ? "Redirection…" : skipTrial ? "S'abonner maintenant" : "Démarrer l'essai gratuit"}
             </button>
           </div>
         </div>
