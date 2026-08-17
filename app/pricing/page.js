@@ -18,7 +18,7 @@ export default function PricingPage() {
     });
   }, [supabase]);
 
-  const [skipTrial, setSkipTrial] = useState(false);
+  const [skipTrial, setSkipTrial] = useState(true);
 
   async function handleUpgrade(plan) {
     if (!acceptedTerms) return;
