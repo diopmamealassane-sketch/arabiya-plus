@@ -3,6 +3,30 @@ import {
   ArrowRight, Volume2, Repeat, Trophy, Target, Mic, Award, Sparkles,
   Headphones, BookOpen, PenLine,
 } from "lucide-react";
+import { createServiceRoleClient } from "@/lib/supabase/server";
+
+// Récupère les compteurs réels depuis Supabase pour la section "preuves".
+// Ne casse jamais le rendu de la page : en cas d'erreur, on retombe sur
+// des valeurs neutres et la section correspondante ne s'affiche pas.
+async function getPlatformStats() {
+  try {
+    const db = createServiceRoleClient();
+
+    const [{ count: leconsCompletees }, { data: xpRows }, { data: activeUsersRows }] =
+      await Promise.all([
+        db.from("user_progress").select("*", { count: "exact", head: true }).eq("status", "completed"),
+        db.from("user_stats").select("xp_total"),
+        db.from("user_progress").select("user_id").eq("status", "completed"),
+      ]);
+
+    const xpTotal = (xpRows || []).reduce((sum, row) => sum + (row.xp_total || 0), 0);
+    const apprenantsActifs = new Set((activeUsersRows || []).map((r) => r.user_id)).size;
+
+    return { leconsCompletees: leconsCompletees ?? 0, xpTotal, apprenantsActifs };
+  } catch {
+    return { leconsCompletees: 0, xpTotal: 0, apprenantsActifs: 0 };
+  }
+}
 
 const CYCLES = [
   { code: "A1", label: "Débutant", desc: "Se saluer, compter, la famille, les couleurs — les fondations solides." },
@@ -13,7 +37,9 @@ const CYCLES = [
   { code: "C2", label: "Expert", desc: "Dialectes, traduction, patrimoine, éloquence — la maîtrise." },
 ];
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const stats = await getPlatformStats();
+
   return (
     <main className="geo-bg min-h-screen">
       <div className="max-w-5xl mx-auto px-6 py-20">
@@ -199,6 +225,23 @@ export default function LandingPage() {
             ))}
           </div>
         </div>
+
+        {/* Preuves — n'apparaît que si les chiffres réels sont assez significatifs */}
+        {stats.leconsCompletees >= 50 && (
+          <div className="mt-24">
+            <p className="text-gold-light uppercase tracking-widest text-sm font-semibold text-center mb-3">
+              Déjà en mouvement
+            </p>
+            <h2 className="text-3xl font-bold text-center mb-12">
+              Une communauté qui progresse chaque jour
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <Stat value={stats.apprenantsActifs.toLocaleString("fr-FR")} label="apprenants actifs" />
+              <Stat value={stats.leconsCompletees.toLocaleString("fr-FR")} label="leçons complétées" />
+              <Stat value={stats.xpTotal.toLocaleString("fr-FR")} label="XP cumulé" />
+            </div>
+          </div>
+        )}
 
         {/* CTA final */}
         <div className="text-center max-w-xl mx-auto mt-24">
