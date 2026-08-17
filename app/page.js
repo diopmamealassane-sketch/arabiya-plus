@@ -281,6 +281,42 @@ export default async function LandingPage() {
           </div>
         )}
 
+        {/* Comparatif — répond à l'objection silencieuse "pourquoi pas un prof ?" sans dévaloriser cette option */}
+        <div className="mt-24">
+          <p className="text-gold-light uppercase tracking-widest text-sm font-semibold text-center mb-3">
+            Un format différent
+          </p>
+          <h2 className="text-3xl font-bold text-center mb-4">
+            Arabiya+ face à un cours classique
+          </h2>
+          <p className="text-center opacity-70 max-w-xl mx-auto mb-12">
+            Deux approches complémentaires, pas concurrentes — beaucoup
+            d'apprenants combinent les deux. Voici où Arabiya+ se situe.
+          </p>
+
+          <div className="bg-ink-2/60 border border-gold/20 rounded-2xl overflow-hidden max-w-2xl mx-auto">
+            <div className="grid grid-cols-3 text-sm font-semibold text-center py-3 border-b border-gold/20 bg-white/5">
+              <span className="opacity-60">Critère</span>
+              <span className="text-gold-light">Arabiya+</span>
+              <span className="opacity-70">Cours classique</span>
+            </div>
+            {[
+              ["Disponibilité", "24h/24, à votre rythme", "Selon horaires fixés"],
+              ["Contenu", "669 leçons, A1 → C2", "Variable selon programme"],
+              ["Prix", "À partir de 7,49 €/mois", "Généralement plus élevé"],
+              ["Feedback prononciation", "Score instantané", "Retour humain, en direct"],
+              ["Révision du vocabulaire", "Automatique et personnalisée", "Rarement systématique"],
+              ["Interaction humaine", "Classement entre apprenants", "Échange direct avec un prof"],
+            ].map(([critere, arabiya, classique]) => (
+              <div key={critere} className="grid grid-cols-3 text-sm py-3 border-b border-gold/10 last:border-0 text-center items-center px-3">
+                <span className="opacity-60 text-left">{critere}</span>
+                <span className="font-semibold">{arabiya}</span>
+                <span className="opacity-70">{classique}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* CTA final */}
         <div className="text-center max-w-xl mx-auto mt-24">
           <h2 className="text-2xl font-bold mb-4">
