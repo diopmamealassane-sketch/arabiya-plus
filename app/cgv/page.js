@@ -27,7 +27,7 @@ export default function CGVPage() {
 <p className="opacity-80 leading-relaxed mb-4">Les tarifs de l'offre Premium sont indiqués en euros, toutes taxes comprises (TTC), sur la page arabiya-plus.com/pricing au moment de la souscription :</p>
 <ul className="list-disc pl-6 opacity-80 leading-relaxed mb-4 space-y-1">
 <li><strong className="text-gold-light font-semibold">Abonnement mensuel</strong> : 9,99 € / mois</li>
-<li><strong className="text-gold-light font-semibold">Abonnement annuel</strong> : 101,90 € / an (soit 8,49 € / mois)</li>
+<li><strong className="text-gold-light font-semibold">Abonnement annuel</strong> : 89,90 € / an (soit 7,49 € / mois)</li>
 </ul>
 <p className="opacity-80 leading-relaxed mb-4">AMOCSSI GROUPE se réserve le droit de modifier ses tarifs à tout moment. Les nouveaux tarifs seront applicables aux nouvelles souscriptions et aux renouvellements postérieurs à leur mise en ligne ; l'Utilisateur en sera informé par email au moins 30 jours avant l'application du nouveau tarif à son abonnement en cours.</p>
 <h2 className="kufi text-xl text-gold-light mt-10 mb-3">Article 4 — Essai gratuit</h2>
