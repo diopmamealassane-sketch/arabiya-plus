@@ -34,7 +34,7 @@ const CYCLES = [
   { code: "B1", label: "Intermédiaire", desc: "Raconter le passé, imaginer l'avenir, donner son avis." },
   { code: "B2", label: "Intermédiaire supérieur", desc: "Débattre, nuancer, comprendre l'actualité et l'art." },
   { code: "C1", label: "Avancé", desc: "Registres de langue, humour, négociation, discours académiques." },
-  { code: "C2", label: "Expert", desc: "Dialectes, traduction, patrimoine, éloquence — la maîtrise." },
+  { code: "C2", label: "Maîtrise", desc: "Dialectes, traduction, patrimoine, éloquence — la maîtrise." },
 ];
 
 export default async function LandingPage() {
@@ -294,19 +294,22 @@ export default async function LandingPage() {
           </div>
         </div>
 
-        {/* Preuves — n'apparaît que si les chiffres réels sont assez significatifs */}
+        {/* Preuves — n'apparaît que si les chiffres réels sont assez significatifs.
+            On n'affiche volontairement que les métriques déjà impressionnantes
+            (leçons complétées, XP cumulé) ; le nombre d'apprenants actifs reste
+            suivi en interne via stats.apprenantsActifs mais n'est pas encore
+            assez élevé pour être mis en avant publiquement. */}
         {stats.leconsCompletees >= 50 && (
           <div className="mt-24">
             <p className="text-gold-light uppercase tracking-widest text-sm font-semibold text-center mb-3">
               Déjà en mouvement
             </p>
             <h2 className="text-3xl font-bold text-center mb-12">
-              Une communauté qui progresse chaque jour
+              Une communauté d'apprenants en pleine progression
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              <Stat value={stats.apprenantsActifs.toLocaleString("fr-FR")} label="apprenants actifs" />
+            <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
               <Stat value={stats.leconsCompletees.toLocaleString("fr-FR")} label="leçons complétées" />
-              <Stat value={stats.xpTotal.toLocaleString("fr-FR")} label="XP cumulé" />
+              <Stat value={stats.xpTotal.toLocaleString("fr-FR")} label="XP gagnés" />
             </div>
           </div>
         )}
