@@ -19,7 +19,7 @@ export async function POST(request) {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
 
-  const { plan } = await request.json().catch(() => ({ plan: "monthly" }));
+  const { plan, skipTrial } = await request.json().catch(() => ({ plan: "monthly", skipTrial: false }));
   const priceId = PRICE_IDS[plan] ?? PRICE_IDS.monthly;
 
   if (!priceId) {
@@ -36,18 +36,23 @@ export async function POST(request) {
     line_items: [{ price: priceId, quantity: 1 }],
     client_reference_id: user.id, // read back in the webhook to know which user paid
     customer_email: user.email,
-    // Essai gratuit de 30 jours — aucune carte requise pour démarrer
-    // (payment_method_collection reste sur son défaut "if_required", donc
-    // Stripe ne la demande pas puisque 0€ est dû aujourd'hui). L'utilisateur
-    // peut ajouter une carte à tout moment depuis son espace client. Si
-    // aucune carte n'est enregistrée à la fin des 30 jours, l'abonnement est
-    // automatiquement annulé (pas de prélèvement surprise).
-    subscription_data: {
-      trial_period_days: 30,
-      trial_settings: {
-        end_behavior: { missing_payment_method: "cancel" },
-      },
-    },
+    // Deux parcours possibles :
+    // - skipTrial=false (défaut) : essai gratuit de 30 jours, aucune carte
+    //   requise pour démarrer (0€ dû aujourd'hui). Résilié automatiquement
+    //   si aucune carte n'est enregistrée à la fin des 30 jours.
+    // - skipTrial=true : pas d'essai, abonnement payé immédiatement au
+    //   tarif choisi — pour les personnes qui préfèrent éviter la mécanique
+    //   "carte demandée + rappel d'annuler avant la fin de l'essai".
+    ...(skipTrial
+      ? {}
+      : {
+          subscription_data: {
+            trial_period_days: 30,
+            trial_settings: {
+              end_behavior: { missing_payment_method: "cancel" },
+            },
+          },
+        }),
     success_url: `${origin}/dashboard?checkout=success`,
     cancel_url: `${origin}/pricing`,
   });
