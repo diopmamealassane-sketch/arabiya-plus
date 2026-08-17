@@ -42,14 +42,20 @@ export default function PricingPage() {
         </p>
 
         <div className="grid md:grid-cols-2 gap-6 text-left mb-8">
-          <div className="bg-parchment text-ink rounded-2xl p-6">
+          <div className="bg-parchment text-ink rounded-2xl p-6 flex flex-col">
             <h2 className="font-bold text-lg mb-1">Gratuit</h2>
             <p className="text-2xl font-bold mb-4">0 €</p>
-            <ul className="space-y-2 text-base">
+            <ul className="space-y-2 text-base mb-6 flex-1">
               <Item>5 premières unités du Cycle 1</Item>
               <Item>XP et série illimités</Item>
               <Item>1 révision par jour</Item>
             </ul>
+            <Link
+              href="/signup"
+              className="block text-center w-full border-2 border-ink/20 font-bold py-3 rounded-xl hover:bg-ink/5 transition"
+            >
+              Continuer avec l'offre gratuite
+            </Link>
           </div>
 
           <div className="bg-ink-2 border-2 border-gold rounded-2xl p-6">
