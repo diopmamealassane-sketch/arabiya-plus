@@ -249,9 +249,10 @@ export default async function LandingPage() {
           </h2>
           <div className="grid md:grid-cols-2 gap-4">
             {CYCLES.map((cycle, i) => (
-              <div
+              <Link
                 key={cycle.code}
-                className="flex items-center gap-4 bg-ink-2/60 border border-gold/20 rounded-2xl p-5"
+                href={`/cours-arabe/${cycle.code.toLowerCase()}`}
+                className="flex items-center gap-4 bg-ink-2/60 border border-gold/20 rounded-2xl p-5 hover:border-gold/50 transition"
               >
                 <div className="shrink-0 w-12 h-12 rounded-full bg-gold/15 text-gold-light font-black flex items-center justify-center">
                   {cycle.code}
@@ -262,7 +263,7 @@ export default async function LandingPage() {
                   </h3>
                   <p className="text-base opacity-70">{cycle.desc}</p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
