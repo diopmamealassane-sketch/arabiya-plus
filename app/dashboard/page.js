@@ -139,12 +139,14 @@ export default async function DashboardPage() {
         )}
 
         <div className="grid gap-4 mb-6">
-          {resumeLesson && completedLessons > 0 && (
+          {resumeLesson && (
             <Link
               href={`/lesson/${resumeLesson.id}`}
               className="block bg-gradient-to-br from-ink to-ink-2 text-white rounded-2xl p-5 shadow-md"
             >
-              <p className="text-sm text-white/60 font-semibold mb-1">Reprendre où vous en étiez</p>
+              <p className="text-sm text-white/60 font-semibold mb-1">
+                {completedLessons > 0 ? "Reprendre où vous en étiez" : "Commencer votre parcours"}
+              </p>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs text-gold-light font-bold uppercase tracking-wide">{resumeLesson.unitTitle}</p>
