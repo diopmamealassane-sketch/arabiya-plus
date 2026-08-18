@@ -137,6 +137,19 @@ export default async function LessonPage({ params }) {
         // puisqu'il n'y a pas de correction automatique, juste une
         // auto-évaluation après avoir répété à voix haute.
         return { id: s.id, kind: s.kind, word: wordById[p.word_id] };
+      case "dialogue":
+        // Texte/dialogue long avec question de compréhension (C1/C2).
+        // Contrairement aux autres types, le contenu n'est pas construit
+        // à partir de mots isolés en base : les répliques et la question
+        // vivent directement dans le payload. L'option correcte (p.answer)
+        // n'est jamais envoyée au client, comme pour les autres types.
+        return {
+          id: s.id,
+          kind: s.kind,
+          lines: p.lines,
+          questionFr: p.question_fr,
+          options: p.options,
+        };
       default:
         return { id: s.id, kind: s.kind };
     }
