@@ -463,23 +463,39 @@ export default function LessonEngine({
           {step.kind === "dialogue" && (
             <>
               <p className="font-semibold mb-4 flex items-center gap-2">
-                <PenLine size={18} /> Lisez le texte, puis répondez
+                <PenLine size={18} /> Lisez le dialogue
               </p>
-              <div className="space-y-3 mb-6 max-h-72 overflow-y-auto pr-1">
-                {(step.lines ?? []).map((line, idx) => (
-                  <div key={idx} className="bg-white/60 border border-black/10 rounded-xl p-3">
-                    {line.speaker && (
-                      <p className="text-xs uppercase tracking-wide text-[#8a8264] font-bold mb-1">
-                        {line.speaker}
-                      </p>
-                    )}
-                    <p className="arabic text-xl" dir="rtl">{line.arabic}</p>
-                    <p className="italic text-[#6b6350] text-sm mt-1">{line.transliteration}</p>
-                    <p className="text-sm font-semibold mt-0.5">{line.french}</p>
-                  </div>
-                ))}
+              <div className="space-y-2.5 mb-6">
+                {(step.lines ?? []).map((line, idx) => {
+                  const isLeft = idx % 2 === 0;
+                  return (
+                    <div key={idx} className={`flex ${isLeft ? "justify-start" : "justify-end"}`}>
+                      <div
+                        className={`max-w-[85%] rounded-2xl px-4 py-2.5 ${
+                          isLeft
+                            ? "bg-white border border-black/10 rounded-bl-sm"
+                            : "bg-ink text-white rounded-br-sm"
+                        }`}
+                      >
+                        {line.speaker && (
+                          <p className={`text-xs font-bold mb-1 ${isLeft ? "text-[#8a8264]" : "text-gold-light"}`}>
+                            {line.speaker}
+                          </p>
+                        )}
+                        <p className="arabic text-xl leading-relaxed" dir="rtl">{line.arabic}</p>
+                        <p className={`text-sm mt-1 ${isLeft ? "opacity-70" : "opacity-80"}`}>{line.french}</p>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-              <p className="font-semibold mb-3">{step.questionFr}</p>
+
+              <div className="border-t border-black/10 pt-4 mb-3">
+                <p className="text-xs uppercase tracking-wide text-[#8a8264] font-bold mb-2">
+                  Question de compréhension
+                </p>
+                <p className="font-semibold">{step.questionFr}</p>
+              </div>
               <div className="flex flex-col gap-2">
                 {(shuffledOptions).map((opt) => (
                   <OptionButton
