@@ -13,6 +13,7 @@ const XP_BY_KIND = {
   order: 15,
   dictee: 15,
   repeat_aloud: 8,
+  dialogue: 20, // exercice plus long (lecture + compréhension) — XP en conséquence
 };
 
 export async function POST(request) {
@@ -132,6 +133,7 @@ function revealCorrectAnswer(step) {
   switch (step.kind) {
     case "mcq_ar_to_fr":
     case "listen":
+    case "dialogue":
       return { value: step.payload.answer };
     case "mcq_fr_to_ar":
       return { wordId: step.payload.answer_word_id };
@@ -153,6 +155,7 @@ function evaluateAnswer(step, userAnswer) {
       return true; // no wrong answer — acknowledging the flashcard is enough
     case "mcq_ar_to_fr":
     case "listen":
+    case "dialogue":
       return userAnswer === step.payload.answer;
     case "mcq_fr_to_ar":
       return userAnswer === step.payload.answer_word_id;
