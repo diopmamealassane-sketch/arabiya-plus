@@ -460,6 +460,42 @@ export default function LessonEngine({
             </>
           )}
 
+          {step.kind === "dialogue" && (
+            <>
+              <p className="font-semibold mb-4 flex items-center gap-2">
+                <PenLine size={18} /> Lisez le texte, puis répondez
+              </p>
+              <div className="space-y-3 mb-6 max-h-72 overflow-y-auto pr-1">
+                {(step.lines ?? []).map((line, idx) => (
+                  <div key={idx} className="bg-white/60 border border-black/10 rounded-xl p-3">
+                    {line.speaker && (
+                      <p className="text-xs uppercase tracking-wide text-[#8a8264] font-bold mb-1">
+                        {line.speaker}
+                      </p>
+                    )}
+                    <p className="arabic text-xl" dir="rtl">{line.arabic}</p>
+                    <p className="italic text-[#6b6350] text-sm mt-1">{line.transliteration}</p>
+                    <p className="text-sm font-semibold mt-0.5">{line.french}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="font-semibold mb-3">{step.questionFr}</p>
+              <div className="flex flex-col gap-2">
+                {(shuffledOptions).map((opt) => (
+                  <OptionButton
+                    key={opt}
+                    label={opt}
+                    isSelected={selected === opt}
+                    isCorrectAnswer={answered && reveal?.value === opt}
+                    isWrongSelected={answered && selected === opt && reveal?.value !== opt}
+                    disabled={answered || submitting}
+                    onClick={() => handleMcqSelect(opt, opt)}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+
           {step.kind === "mcq_fr_to_ar" && (
             <>
               <p className="font-semibold mb-4">Comment dit-on « {step.promptFr} » ?</p>
