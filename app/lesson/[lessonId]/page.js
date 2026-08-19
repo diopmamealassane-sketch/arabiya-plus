@@ -1,8 +1,13 @@
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import LessonEngine from "@/components/LessonEngine";
+import { getMonthStartDate, getNextMonthStartDate, formatDateFr } from "@/lib/monthUtils";
+import { Lock, ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
+
+const MONTHLY_LESSON_LIMIT = 200;
 
 export default async function LessonPage({ params }) {
   const supabase = createServerSupabaseClient();
@@ -19,22 +24,73 @@ export default async function LessonPage({ params }) {
 
   if (!lesson) redirect("/dashboard");
 
+  const monthStart = getMonthStartDate();
+  const monthStartDate = new Date(`${monthStart}T00:00:00.000Z`);
+
   // Leçons voisines (même unité) pour la navigation précédente/suivante,
-  // et le statut de progression pour reconnaître une leçon déjà validée.
-  const [{ data: siblingLessons }, { data: progressRow }, { data: unit }] = await Promise.all([
-    supabase
-      .from("lessons")
-      .select("id, order_index")
-      .eq("unit_id", lesson.unit_id)
-      .order("order_index"),
-    supabase
-      .from("user_progress")
-      .select("status")
-      .eq("user_id", user.id)
-      .eq("lesson_id", lesson.id)
-      .maybeSingle(),
-    supabase.from("units").select("cycle, order_index").eq("id", lesson.unit_id).single(),
-  ]);
+  // le statut de progression (pour reconnaître une leçon déjà validée),
+  // et le nombre de NOUVELLES leçons déjà validées ce mois-ci — utilisé
+  // pour appliquer le quota mensuel de 200 avant même d'afficher la leçon.
+  const [{ data: siblingLessons }, { data: progressRow }, { data: unit }, { count: monthlyCount }] =
+    await Promise.all([
+      supabase
+        .from("lessons")
+        .select("id, order_index")
+        .eq("unit_id", lesson.unit_id)
+        .order("order_index"),
+      supabase
+        .from("user_progress")
+        .select("status, completed_at")
+        .eq("user_id", user.id)
+        .eq("lesson_id", lesson.id)
+        .maybeSingle(),
+      supabase.from("units").select("cycle, order_index").eq("id", lesson.unit_id).single(),
+      supabase
+        .from("user_progress")
+        .select("lesson_id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .eq("status", "completed")
+        .gte("completed_at", monthStartDate.toISOString()),
+    ]);
+
+  const alreadyCompleted = progressRow?.status === "completed";
+
+  // Une leçon déjà validée CE MOIS-CI reste toujours accessible (c'est de
+  // la révision, jamais comptée dans le quota). Une leçon jamais faite, ou
+  // faite un mois précédent, est en revanche soumise à la limite : si le
+  // quota des 200 nouvelles leçons du mois est déjà atteint, on bloque
+  // l'accès à la page elle-même plutôt que de laisser l'utilisateur
+  // commencer une leçon qui ne pourra de toute façon pas être enregistrée.
+  const completedThisMonth =
+    alreadyCompleted && progressRow?.completed_at && new Date(progressRow.completed_at) >= monthStartDate;
+
+  const isBlocked = !completedThisMonth && (monthlyCount ?? 0) >= MONTHLY_LESSON_LIMIT;
+
+  if (isBlocked) {
+    const resetDate = formatDateFr(getNextMonthStartDate());
+    return (
+      <main className="geo-bg min-h-screen flex items-center justify-center px-4">
+        <div className="bg-parchment text-ink rounded-2xl p-8 max-w-sm w-full text-center float-in">
+          <div className="w-14 h-14 rounded-full bg-rust/10 border-2 border-rust/40 flex items-center justify-center mx-auto mb-5">
+            <Lock size={24} className="text-[#8C3327]" />
+          </div>
+          <h2 className="text-xl font-bold text-ink mb-3">Limite mensuelle atteinte</h2>
+          <p className="text-sm text-[#6b6350] mb-6 leading-relaxed">
+            🔒 Vous avez atteint la limite de {MONTHLY_LESSON_LIMIT} nouvelles leçons pour ce mois-ci. C'est une
+            pause volontaire pour vous aider à mieux mémoriser ce que vous avez déjà appris. Vous pouvez continuer à
+            réviser librement toutes vos leçons déjà validées. De nouvelles leçons seront à nouveau disponibles le{" "}
+            {resetDate}.
+          </p>
+          <Link
+            href="/dashboard"
+            className="w-full bg-gradient-to-b from-gold-light to-gold text-[#241A02] font-bold py-3 rounded-xl flex items-center justify-center gap-2"
+          >
+            <ArrowLeft size={20} /> Retour au tableau de bord
+          </Link>
+        </div>
+      </main>
+    );
+  }
 
   const siblingIndex = (siblingLessons ?? []).findIndex((l) => l.id === lesson.id);
   let prevLessonId = siblingIndex > 0 ? siblingLessons[siblingIndex - 1].id : null;
@@ -64,8 +120,6 @@ export default async function LessonPage({ params }) {
       nextLessonId = firstLessonNextUnit?.id ?? null;
     }
   }
-
-  const alreadyCompleted = progressRow?.status === "completed";
 
   const steps = (lesson.steps ?? []).sort((a, b) => a.order_index - b.order_index);
 
