@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Volume2, X, Check, ArrowRight, ArrowLeft, RotateCcw, CheckCircle2, Mic, PenLine, Sparkles } from "lucide-react";
+import { Volume2, X, Check, ArrowRight, ArrowLeft, RotateCcw, CheckCircle2, Mic, PenLine, Sparkles, AlertTriangle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { scorePronunciation } from "@/lib/pronunciationScore";
 
@@ -33,6 +33,12 @@ export default function LessonEngine({
   const [recognitionState, setRecognitionState] = useState("idle"); // idle | listening | unsupported
   const [pronunciationScore, setPronunciationScore] = useState(null);
   const [cultureBite, setCultureBite] = useState(null);
+  // Message éventuel renvoyé par /api/complete-lesson concernant le quota
+  // mensuel de 200 nouvelles leçons : soit une alerte de palier (100, 130,
+  // 160, 190, 195 — l'utilisateur continue normalement), soit un blocage
+  // (limite atteinte — la leçon n'a pas été enregistrée comme nouvelle
+  // validation ce mois-ci, seule la révision reste possible).
+  const [monthlyNotice, setMonthlyNotice] = useState(null); // { type: "warning" | "blocked", message: string }
   const voicesRef = useRef([]);
   const recognitionRef = useRef(null);
   const audioRef = useRef(null);
@@ -268,6 +274,12 @@ export default function LessonEngine({
   // C'est CET appel qui marque réellement la leçon comme terminée — sans
   // lui, la progression reste à zéro indéfiniment quel que soit l'effort
   // réel de l'utilisateur. Protégé par une ref pour ne partir qu'une fois.
+  //
+  // La route peut désormais répondre de trois façons : succès simple,
+  // succès avec un message de palier mensuel (100/130/160/190/195 leçons
+  // ce mois-ci), ou refus (403) si la limite de 200 nouvelles leçons/mois
+  // est atteinte. Dans les deux derniers cas, on affiche le message sur
+  // l'écran de fin de leçon.
   useEffect(() => {
     if (!done || doneReportedRef.current) return;
     doneReportedRef.current = true;
@@ -275,11 +287,21 @@ export default function LessonEngine({
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ lesson_id: lessonId, accuracy: note * 5 }), // note/20 -> %/100
-    }).catch(() => {
-      // Si ça échoue (ex. hors-ligne), l'utilisateur garde son XP et son
-      // score affiché — seule la coche "terminée" du tableau de bord ne
-      // se mettra pas à jour cette fois, ce n'est pas bloquant.
-    });
+    })
+      .then(async (res) => {
+        const data = await res.json().catch(() => null);
+        if (!data) return;
+        if (res.status === 403 && data.error === "monthly_limit_reached") {
+          setMonthlyNotice({ type: "blocked", message: data.message });
+        } else if (data.warning) {
+          setMonthlyNotice({ type: "warning", message: data.warning });
+        }
+      })
+      .catch(() => {
+        // Si ça échoue (ex. hors-ligne), l'utilisateur garde son XP et son
+        // score affiché — seule la coche "terminée" du tableau de bord ne
+        // se mettra pas à jour cette fois, ce n'est pas bloquant.
+      });
   }, [done]);
 
   // Capsule culturelle affichée sur l'écran de fin de leçon — purement
@@ -314,6 +336,28 @@ export default function LessonEngine({
           <p className="text-sm text-[#8a8264] mb-6">
             {correctCount} / {gradedCount} bonnes réponses · +{xpEarned} XP
           </p>
+
+          {monthlyNotice && (
+            <div
+              className={`rounded-xl p-4 mb-6 text-left border-2 flex gap-2.5 items-start ${
+                monthlyNotice.type === "blocked"
+                  ? "bg-rust/10 border-rust/40"
+                  : "bg-gold/10 border-gold/40"
+              }`}
+            >
+              <AlertTriangle
+                size={18}
+                className={`shrink-0 mt-0.5 ${monthlyNotice.type === "blocked" ? "text-[#8C3327]" : "text-[#7a5c14]"}`}
+              />
+              <p
+                className={`text-sm font-semibold ${
+                  monthlyNotice.type === "blocked" ? "text-[#8C3327]" : "text-[#7a5c14]"
+                }`}
+              >
+                {monthlyNotice.message}
+              </p>
+            </div>
+          )}
 
           {cultureBite && (
             <div className="bg-white border-2 border-gold/30 rounded-xl p-4 mb-6 text-left">
