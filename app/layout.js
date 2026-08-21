@@ -1,6 +1,7 @@
 import "./globals.css";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import { Analytics } from "@vercel/analytics/next";
+import Script from "next/script";
 
 const SITE_URL = "https://arabiya-plus.com";
 
@@ -102,6 +103,18 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className="font-sans text-parchment">
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-W2E37MNGBN"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-W2E37MNGBN');
+          `}
+        </Script>
         <ServiceWorkerRegister />
         {children}
         <Analytics />
