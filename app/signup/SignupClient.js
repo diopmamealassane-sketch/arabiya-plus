@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
-export default function SignupPage() {
+   export default function SignupClient() {
   const supabase = createClient();
   const [fullName, setFullName] = useState("");
   const [displayName, setDisplayName] = useState("");
