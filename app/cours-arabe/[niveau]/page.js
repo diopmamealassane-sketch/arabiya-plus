@@ -172,6 +172,11 @@ export async function generateMetadata({ params }) {
       url,
       type: "website",
     },
+    twitter: {
+      card: "summary_large_image",
+      title: level.title,
+      description: level.metaDescription,
+    },
   };
 }
 
@@ -266,4 +271,3 @@ export default function NiveauPage({ params }) {
     </main>
   );
 }
-
