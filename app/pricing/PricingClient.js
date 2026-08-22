@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Check } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
-export default function PricingPage() {
+   export default function PricingClient() {
   const supabase = createClient();
   const [loading, setLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("annual");
