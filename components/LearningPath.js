@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 const CYCLE_LABELS = {
+  0: "Cycle 0 — Lire l'arabe",
   A1: "Cycle 1 — Débutant (A1)",
   A2: "Cycle 2 — Élémentaire (A2)",
   B1: "Cycle 3 — Intermédiaire (B1)",
@@ -21,6 +22,7 @@ const CYCLE_LABELS = {
 // cohérente sans mapping à maintenir manuellement.
 function unitIcon(title) {
   const t = title.toLowerCase();
+  if (t.includes("lettre") || t.includes("alphabet") || t.includes("lire")) return BookOpen;
   if (t.includes("saluer") || t.includes("politesse")) return Hand;
   if (t.includes("famille") || t.includes("ami")) return Users;
   if (t.includes("chiffre") || t.includes("nombre")) return Hash;
@@ -137,9 +139,9 @@ export default function LearningPath({ unitsByCycle, progressByLesson, isPremium
               </span>
             </button>
 
-            {coreComplete && (
+            {coreComplete && group.cycle !== "0" && (
               <div className="px-5 pb-4 -mt-1">
-                <a
+                
                   href={`/api/certificate?cycle=${group.cycle}`}
                   className="inline-flex items-center gap-2 text-sm font-bold text-[#7a5c14] bg-gold/15 hover:bg-gold/25 transition-colors px-3 py-2 rounded-lg"
                 >
