@@ -135,6 +135,33 @@ export default async function LandingPage() {
           </div>
         </div>
 
+        {/* Cycle 0 — accroche dédiée aux débutants absolus qui ne savent pas
+            encore lire l'alphabet arabe. Placée juste après le Hero pour
+            capter ce public avant qu'il ne pense que la page ne s'adresse
+            pas à lui. Entièrement gratuit, aucune carte requise. */}
+        <div className="mt-16 bg-gradient-to-b from-gold/10 to-transparent border-2 border-gold/30 rounded-3xl p-8 md:p-10 max-w-2xl mx-auto text-center">
+          <p className="text-gold-light uppercase tracking-widest text-sm font-semibold mb-3">
+            100% gratuit — aucune carte requise
+          </p>
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">
+            Vous ne savez pas encore lire l'alphabet arabe ?
+          </h2>
+          <p className="opacity-80 mb-6">
+            Commencez par le Cycle 0 : les 28 lettres, une par une — leur son,
+            leurs formes, comment elles se relient entre elles — jusqu'à
+            déchiffrer vos premiers mots. Aucune connaissance préalable requise.
+          </p>
+          <div className="arabic text-4xl mb-6 opacity-90" dir="rtl">
+            ا ب ت ث ج ح خ ...
+          </div>
+          <Link
+            href="/signup"
+            className="inline-flex items-center gap-2 bg-gradient-to-b from-gold-light to-gold text-[#241A02] font-bold px-8 py-4 rounded-2xl"
+          >
+            Apprendre l'alphabet gratuitement <ArrowRight size={20} />
+          </Link>
+        </div>
+
         {/* Bandeau chiffres */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-24">
           <Stat value="669" label="leçons" />
