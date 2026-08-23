@@ -17,9 +17,6 @@ const CYCLE_LABELS = {
   C2: "Cycle 6 — Expert (C2)",
 };
 
-// Icône par thème d'unité — reconnue sur un mot-clé du titre, pas sur un ID,
-// pour que le prochain contenu ajouté hérite automatiquement d'une icône
-// cohérente sans mapping à maintenir manuellement.
 function unitIcon(title) {
   const t = title.toLowerCase();
   if (t.includes("lettre") || t.includes("alphabet") || t.includes("lire")) return BookOpen;
@@ -34,10 +31,6 @@ function unitIcon(title) {
   return BookOpen;
 }
 
-// Une unité est un "examen de cycle" si son titre l'indique explicitement,
-// pas selon sa position — ça évite qu'une nouvelle unité ajoutée après les
-// 10 unités classiques (ex. une unité de révision) soit prise à tort pour
-// l'examen final et se retrouve verrouillée jusqu'à la fin du cycle.
 function isExamUnitTitle(title) {
   return title.startsWith("Examen de cycle");
 }
@@ -45,10 +38,6 @@ function isExamUnitTitle(title) {
 export default function LearningPath({ unitsByCycle, progressByLesson, isPremium }) {
   const [expandedUnitId, setExpandedUnitId] = useState(null);
 
-  // Trouve la première unité déverrouillée et non-terminée, tous cycles
-  // confondus dans l'ordre d'affichage — c'est elle qui reçoit le badge "or"
-  // et l'étiquette "Continuer ici". Le cycle qui la contient est celui
-  // ouvert par défaut ci-dessous.
   let currentUnitId = null;
   let currentCycle = null;
   outer: for (const group of unitsByCycle) {
@@ -75,9 +64,6 @@ export default function LearningPath({ unitsByCycle, progressByLesson, isPremium
     }
   }
 
-  // Un seul cycle ouvert à la fois, replié par défaut sauf celui du
-  // "Continuer ici" — évite une page interminable quand il y a beaucoup
-  // de cycles.
   const [openCycle, setOpenCycle] = useState(
     currentCycle ?? unitsByCycle[0]?.cycle ?? null
   );
@@ -98,9 +84,6 @@ export default function LearningPath({ unitsByCycle, progressByLesson, isPremium
         );
         const cycleComplete = cycleTotal > 0 && cycleDone === cycleTotal;
 
-        // Les unités "examen de cycle" ne doivent se débloquer qu'une fois
-        // toutes les autres unités du cycle terminées — on calcule donc leur
-        // progression à part, sans compter l'examen lui-même dans le total.
         const coreUnits = group.units.filter((u) => !isExamUnitTitle(u.title_fr));
         const coreTotal = coreUnits.reduce((sum, u) => sum + (u.lessons?.length ?? 0), 0);
         const coreDone = coreUnits.reduce(
