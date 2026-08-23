@@ -124,12 +124,12 @@ export default function LearningPath({ unitsByCycle, progressByLesson, isPremium
 
             {coreComplete && group.cycle !== "0" && (
               <div className="px-5 pb-4 -mt-1">
-                
+                <Link
                   href={`/api/certificate?cycle=${group.cycle}`}
                   className="inline-flex items-center gap-2 text-sm font-bold text-[#7a5c14] bg-gold/15 hover:bg-gold/25 transition-colors px-3 py-2 rounded-lg"
                 >
                   <Award size={16} /> Télécharger votre certificat
-                </a>
+                </Link>
               </div>
             )}
 
