@@ -33,11 +33,6 @@ export default function LessonEngine({
   const [recognitionState, setRecognitionState] = useState("idle"); // idle | listening | unsupported
   const [pronunciationScore, setPronunciationScore] = useState(null);
   const [cultureBite, setCultureBite] = useState(null);
-  // Message éventuel renvoyé par /api/complete-lesson concernant le quota
-  // mensuel de 200 nouvelles leçons : soit une alerte de palier (100, 130,
-  // 160, 190, 195 — l'utilisateur continue normalement), soit un blocage
-  // (limite atteinte — la leçon n'a pas été enregistrée comme nouvelle
-  // validation ce mois-ci, seule la révision reste possible).
   const [monthlyNotice, setMonthlyNotice] = useState(null); // { type: "warning" | "blocked", message: string }
   const voicesRef = useRef([]);
   const recognitionRef = useRef(null);
@@ -48,11 +43,6 @@ export default function LessonEngine({
   const done = stepIndex >= steps.length;
   const step = !done ? steps[stepIndex] : null;
 
-  // Corrige un vrai bug : les options venaient de la base dans un ordre où
-  // la bonne réponse était systématiquement en première position. On les
-  // mélange une fois par question (stable pendant qu'elle est affichée),
-  // sans jamais toucher à `step.options` lui-même (qui reste la source
-  // de vérité envoyée au serveur pour la validation).
   const shuffledOptions = useMemo(() => {
     if (!step?.options) return [];
     const arr = [...step.options];
@@ -85,19 +75,12 @@ export default function LessonEngine({
     return () => window.speechSynthesis.removeEventListener("voiceschanged", loadVoices);
   }, []);
 
-  // Nettoyage : si l'utilisateur navigue pendant qu'un audio joue.
   useEffect(() => {
     return () => {
       audioRef.current?.pause?.();
     };
   }, []);
 
-  // Lecture audio d'un mot : utilise le fichier audio ElevenLabs
-  // (word.audio_url) en priorité — c'est un vrai enregistrement, donc
-  // fonctionne partout, y compris dans l'app mobile (Capacitor WebView)
-  // où aucune voix arabe système n'est installée. Si le mot n'a pas
-  // encore d'audio généré (audio_url vide), on retombe sur la synthèse
-  // vocale du navigateur comme avant.
   function playWord(word) {
     if (!word) {
       setLastSpokenOk(false);
@@ -111,8 +94,6 @@ export default function LessonEngine({
         audioRef.current = audio;
         audio.onplay = () => setLastSpokenOk(true);
         audio.onerror = () => {
-          // Fichier audio inaccessible (réseau, URL cassée…) → repli sur
-          // la synthèse vocale plutôt que de laisser l'utilisateur bloqué.
           speakFallback(word.arabic_vocalized);
         };
         audio.play().catch(() => {
@@ -157,12 +138,6 @@ export default function LessonEngine({
     }
   }
 
-  // Reconnaissance vocale du navigateur pour l'étape "répéter à voix
-  // haute" : on écoute ce que l'utilisateur prononce, on compare au mot
-  // attendu (tolérant aux harakat comme la dictée) et on note sur 100.
-  // Non disponible partout (Chrome/Edge oui, Firefox/Safari non) — dans
-  // ce cas on retombe simplement sur l'auto-évaluation manuelle
-  // existante, qui reste toujours affichée en complément.
   function startPronunciationCheck(targetWord) {
     const SpeechRecognitionCtor =
       typeof window !== "undefined" && (window.SpeechRecognition || window.webkitSpeechRecognition);
@@ -221,8 +196,6 @@ export default function LessonEngine({
         setTimeout(() => setShake(false), 420);
       }
     } catch {
-      // If grading fails (e.g. offline), don't strand the user — let them
-      // continue without XP rather than block the lesson.
       setIsCorrect(false);
       if (step.kind !== "intro") setGradedCount((c) => c + 1);
       setAnswered(true);
@@ -259,9 +232,6 @@ export default function LessonEngine({
     setStepIndex((i) => i + 1);
   }
 
-  // Note sur 20, calculée sur les exercices notables uniquement (les écrans
-  // "intro" ne comptent pas — ce ne sont pas des questions, juste des
-  // flashcards de découverte).
   const note = gradedCount > 0 ? Math.round((correctCount / gradedCount) * 20) : 20;
   const appreciation =
     note >= 18 ? "Excellent !" :
@@ -271,22 +241,13 @@ export default function LessonEngine({
     note >= 10 ? "Passable." :
     "Peut mieux faire.";
 
-  // C'est CET appel qui marque réellement la leçon comme terminée — sans
-  // lui, la progression reste à zéro indéfiniment quel que soit l'effort
-  // réel de l'utilisateur. Protégé par une ref pour ne partir qu'une fois.
-  //
-  // La route peut désormais répondre de trois façons : succès simple,
-  // succès avec un message de palier mensuel (100/130/160/190/195 leçons
-  // ce mois-ci), ou refus (403) si la limite de 200 nouvelles leçons/mois
-  // est atteinte. Dans les deux derniers cas, on affiche le message sur
-  // l'écran de fin de leçon.
   useEffect(() => {
     if (!done || doneReportedRef.current) return;
     doneReportedRef.current = true;
     fetch("/api/complete-lesson", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ lesson_id: lessonId, accuracy: note * 5 }), // note/20 -> %/100
+      body: JSON.stringify({ lesson_id: lessonId, accuracy: note * 5 }),
     })
       .then(async (res) => {
         const data = await res.json().catch(() => null);
@@ -297,18 +258,9 @@ export default function LessonEngine({
           setMonthlyNotice({ type: "warning", message: data.warning });
         }
       })
-      .catch(() => {
-        // Si ça échoue (ex. hors-ligne), l'utilisateur garde son XP et son
-        // score affiché — seule la coche "terminée" du tableau de bord ne
-        // se mettra pas à jour cette fois, ce n'est pas bloquant.
-      });
+      .catch(() => {});
   }, [done]);
 
-  // Capsule culturelle affichée sur l'écran de fin de leçon — purement
-  // décorative, donc un échec réseau ne doit jamais bloquer l'écran de
-  // résultat : on l'ignore silencieusement le cas échéant. cache: "no-store"
-  // empêche le navigateur de réutiliser une réponse précédente au lieu
-  // d'aller retirer une nouvelle capsule au hasard côté serveur.
   useEffect(() => {
     if (!done) return;
     fetch("/api/culture-bite/random", { cache: "no-store" })
@@ -633,7 +585,7 @@ export default function LessonEngine({
                 {(shuffledOptions).map((opt) => (
                   <OptionButton
                     key={opt}
-                    label={opt}
+                    arabicLabel={opt}
                     isSelected={selected === opt}
                     isCorrectAnswer={answered && reveal?.value === opt}
                     isWrongSelected={answered && selected === opt && reveal?.value !== opt}
