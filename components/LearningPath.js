@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 
 const CYCLE_LABELS = {
-  0: "Cycle 0 — Lire l'arabe",
+  0: "Cycle 0 — Alphabet arabe",
   A1: "Cycle 1 — Débutant (A1)",
   A2: "Cycle 2 — Élémentaire (A2)",
   B1: "Cycle 3 — Intermédiaire (B1)",
