@@ -454,7 +454,7 @@ export default function PlacementTestPage() {
     } catch (err) {
       alert("ERREUR : " + err.message);
     }
-  
+  }
 
   function restart() {
     window.location.reload(); // régénère un nouveau tirage aléatoire
