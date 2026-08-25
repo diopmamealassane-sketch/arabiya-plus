@@ -443,17 +443,11 @@ export default function PlacementTestPage() {
 
   function handleTypeSubmit(e) {
     e.preventDefault();
-    alert("handleTypeSubmit appelé ! typedAnswer=" + typedAnswer + " answer=" + current.answer);
     if (typedResult !== null) return;
-    try {
-      const correct = arabicAnswersMatch(typedAnswer, current.answer);
-      alert("Résultat comparaison : " + correct);
-      setTypedResult(correct);
-      recordObjective(current.cycle, correct);
-      setTimeout(advance, 1100);
-    } catch (err) {
-      alert("ERREUR : " + err.message);
-    }
+    const correct = arabicAnswersMatch(typedAnswer, current.answer);
+    setTypedResult(correct);
+    recordObjective(current.cycle, correct);
+    setTimeout(advance, 1100);
   }
 
   function restart() {
