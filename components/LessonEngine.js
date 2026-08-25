@@ -37,6 +37,7 @@ export default function LessonEngine({
   const voicesRef = useRef([]);
   const recognitionRef = useRef(null);
   const audioRef = useRef(null);
+  const continueBtnRef = useRef(null);
 
   const doneReportedRef = useRef(false);
 
@@ -64,6 +65,16 @@ export default function LessonEngine({
     setRecognitionState((s) => (s === "unsupported" ? s : "idle"));
     recognitionRef.current?.abort?.();
   }, [stepIndex]);
+
+  useEffect(() => {
+    if (!answered) return;
+    // Amène automatiquement le bouton "Continuer" en vue dès que la réponse
+    // est validée, pour éviter à l'utilisateur de devoir défiler manuellement.
+    const t = setTimeout(() => {
+      continueBtnRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 80);
+    return () => clearTimeout(t);
+  }, [answered]);
 
   useEffect(() => {
     if (!("speechSynthesis" in window)) return;
@@ -738,6 +749,7 @@ export default function LessonEngine({
                 {isCorrect ? "Parfait !" : "Pas tout à fait — la bonne réponse est en surbrillance."}
               </p>
               <button
+                ref={continueBtnRef}
                 onClick={nextStep}
                 className={`w-full mt-4 py-3 rounded-xl font-bold text-white flex items-center justify-center gap-2 ${
                   isCorrect ? "bg-teal" : "bg-rust"
