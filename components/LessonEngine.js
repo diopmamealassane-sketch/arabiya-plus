@@ -170,14 +170,7 @@ export default function LessonEngine({
       const score = scorePronunciation(transcript, targetWord);
       setPronunciationScore(score);
       setRecognitionState("idle");
-      // Une syllabe isolée (ex. "جَ") est intrinsèquement plus dure à
-      // capter fidèlement par la reconnaissance vocale du navigateur
-      // qu'un mot entier — on assouplit donc le seuil de réussite
-      // uniquement pour les mots très courts, sans toucher au seuil
-      // normal des mots de lecture plus longs.
-      const isShortSyllable = normalizeArabic(targetWord).length <= 3;
-      const threshold = isShortSyllable ? 40 : 60;
-      handleMcqSelect(score >= threshold, score >= threshold);
+      handleMcqSelect(score >= 60, score >= 60);
     };
     recognition.onend = () => {
       setRecognitionState((s) => (s === "listening" ? "idle" : s));
@@ -800,4 +793,4 @@ function OptionButton({ label, arabicLabel, isSelected, isCorrectAnswer, isWrong
       {isCorrectAnswer && <Check size={20} className="text-teal" />}
     </button>
   );
-              }
+                  }
