@@ -163,7 +163,12 @@ export default function LessonEngine({
     recognitionRef.current = recognition;
 
     recognition.onstart = () => setRecognitionState("listening");
-    recognition.onerror = () => setRecognitionState("idle");
+    recognition.onerror = (event) => {
+      // Diagnostic temporaire : affiche l'erreur réelle au lieu de la
+      // masquer silencieusement, pour identifier la vraie cause.
+      alert("Erreur reconnaissance vocale : " + event.error);
+      setRecognitionState("idle");
+    };
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       const score = scorePronunciation(transcript, targetWord);
@@ -177,6 +182,11 @@ export default function LessonEngine({
 
     try {
       recognition.start();
+      setTimeout(() => {
+        try {
+          recognition.stop();
+        } catch {}
+      }, 5000);
     } catch {
       setRecognitionState("idle");
     }
@@ -695,7 +705,7 @@ export default function LessonEngine({
                 </button>
                 {recognitionState !== "unsupported" && !answered && (
                   <button
-                    onClick={() => startPronunciationCheck(step.word?.arabic_vocalized)}
+                    onClick={() => startPronunciationCheck(step.word?.audio_text || step.word?.arabic_vocalized)}
                     disabled={recognitionState === "listening" || submitting}
                     className={`w-14 h-14 rounded-full flex items-center justify-center ${
                       recognitionState === "listening"
