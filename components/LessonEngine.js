@@ -68,8 +68,6 @@ export default function LessonEngine({
 
   useEffect(() => {
     if (!answered) return;
-    // Amène automatiquement le bouton "Continuer" en vue dès que la réponse
-    // est validée, pour éviter à l'utilisateur de devoir défiler manuellement.
     const t = setTimeout(() => {
       continueBtnRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
     }, 80);
@@ -412,6 +410,13 @@ export default function LessonEngine({
           {step.kind === "intro" && (
             <>
               <div className="text-center py-3">
+                {step.word?.image_url && (
+                  <img
+                    src={step.word.image_url}
+                    alt={step.word?.french ?? ""}
+                    className="w-32 h-32 object-cover rounded-2xl mx-auto mb-4 border-2 border-black/10"
+                  />
+                )}
                 <div className="arabic text-5xl" dir="rtl">{step.word?.arabic_vocalized}</div>
                 <div className="italic text-[#6b6350] mt-2 text-base">{step.word?.transliteration}</div>
                 <div className="font-semibold mt-1">{step.word?.french}</div>
