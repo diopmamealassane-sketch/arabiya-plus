@@ -134,10 +134,10 @@ export default async function LessonPage({ params }) {
     (p.chip_word_ids ?? []).forEach((id) => wordIds.add(id));
   }
 
-const { data: words, error: wordsError } = await supabase
-  .from("words")
-  .select("id, arabic_vocalized, transliteration, french, audio_url, image_url")
-  .in("id", Array.from(wordIds));
+  const { data: words, error: wordsError } = await supabase
+    .from("words")
+    .select("id, arabic_vocalized, transliteration, french, audio_url, audio_text, image_url")
+    .in("id", Array.from(wordIds));
 
   if (wordsError) {
     console.error("Erreur fetch words pour la leçon", lesson.id, ":", wordsError.message, wordsError);
