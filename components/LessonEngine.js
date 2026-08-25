@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Volume2, X, Check, ArrowRight, ArrowLeft, RotateCcw, CheckCircle2, Mic, PenLine, Sparkles, AlertTriangle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { scorePronunciation } from "@/lib/pronunciationScore";
+import { normalizeArabic } from "@/lib/arabicNormalize";
 
 export default function LessonEngine({
   lessonTitle,
@@ -163,18 +164,20 @@ export default function LessonEngine({
     recognitionRef.current = recognition;
 
     recognition.onstart = () => setRecognitionState("listening");
-    recognition.onerror = (event) => {
-      // Diagnostic temporaire : affiche l'erreur réelle au lieu de la
-      // masquer silencieusement, pour identifier la vraie cause.
-      alert("Erreur reconnaissance vocale : " + event.error);
-      setRecognitionState("idle");
-    };
+    recognition.onerror = () => setRecognitionState("idle");
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       const score = scorePronunciation(transcript, targetWord);
       setPronunciationScore(score);
       setRecognitionState("idle");
-      handleMcqSelect(score >= 60, score >= 60);
+      // Une syllabe isolée (ex. "جَ") est intrinsèquement plus dure à
+      // capter fidèlement par la reconnaissance vocale du navigateur
+      // qu'un mot entier — on assouplit donc le seuil de réussite
+      // uniquement pour les mots très courts, sans toucher au seuil
+      // normal des mots de lecture plus longs.
+      const isShortSyllable = normalizeArabic(targetWord).length <= 3;
+      const threshold = isShortSyllable ? 40 : 60;
+      handleMcqSelect(score >= threshold, score >= threshold);
     };
     recognition.onend = () => {
       setRecognitionState((s) => (s === "listening" ? "idle" : s));
@@ -182,11 +185,6 @@ export default function LessonEngine({
 
     try {
       recognition.start();
-      setTimeout(() => {
-        try {
-          recognition.stop();
-        } catch {}
-      }, 5000);
     } catch {
       setRecognitionState("idle");
     }
