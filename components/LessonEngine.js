@@ -717,6 +717,12 @@ export default function LessonEngine({
                 )}
               </div>
 
+              {normalizeArabic(step.word?.audio_text || step.word?.arabic_vocalized || "").length <= 1 && !answered && (
+                <p className="text-sm text-center text-[#8a8264] mb-3">
+                  ⚠️ Ce son est très court — la reconnaissance vocale peut ne rien détecter. Si le micro ne réagit pas après quelques secondes, évaluez-vous vous-même ci-dessous.
+                </p>
+              )}
+
               {recognitionState === "listening" && (
                 <p className="text-sm text-center text-[#7a5c14] font-semibold mb-4">
                   🎙️ Je vous écoute — parlez maintenant…
@@ -794,4 +800,4 @@ function OptionButton({ label, arabicLabel, isSelected, isCorrectAnswer, isWrong
       {isCorrectAnswer && <Check size={20} className="text-teal" />}
     </button>
   );
-}
+              }
