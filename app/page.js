@@ -147,9 +147,10 @@ export default async function LandingPage() {
             Vous ne savez pas encore lire l'alphabet arabe ?
           </h2>
           <p className="opacity-80 mb-6">
-            Commencez par le Cycle 0 : les 28 lettres, une par une — leur son,
-            leurs formes, comment elles se relient entre elles — jusqu'à
-            déchiffrer vos premiers mots. Aucune connaissance préalable requise.
+            Commencez par le Cycle 0 : 57 leçons pour apprendre les 28 lettres,
+            une par une — leur son, leurs formes, comment elles se relient entre
+            elles — jusqu'à déchiffrer vos premiers mots. Aucune connaissance
+            préalable requise.
           </p>
           <div className="arabic text-4xl mb-6 opacity-90" dir="rtl">
             ا ب ت ث ج ح خ ...
