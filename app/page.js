@@ -1,7 +1,7 @@
 import Link from "next/link";
 import {
   ArrowRight, Volume2, Repeat, Trophy, Target, Mic, Award, Sparkles,
-  Headphones, BookOpen, PenLine, Lock, Check,
+  Headphones, BookOpen, PenLine, Lock, Check, Star, Quote,
 } from "lucide-react";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 
@@ -35,6 +35,24 @@ const CYCLES = [
   { code: "B2", label: "Intermédiaire supérieur", desc: "Débattre, nuancer, comprendre l'actualité et l'art." },
   { code: "C1", label: "Avancé", desc: "Registres de langue, humour, négociation, discours académiques." },
   { code: "C2", label: "Maîtrise", desc: "Dialectes, traduction, patrimoine, éloquence — la maîtrise." },
+];
+
+// Témoignages réels d'apprenants, recueillis par email avec leur accord.
+// Le pseudo affiché est celui qu'ils ont eux-mêmes choisi.
+// N'ajouter ici que des retours authentiques et vérifiables.
+const TEMOIGNAGES = [
+  {
+    pseudo: "Pape_Mbodji",
+    note: 5,
+    texte:
+      "Arabiya+ est une très bonne plateforme pour apprendre l’arabe ! J’apprécie particulièrement la diversité des contenus, qui permet d’enrichir progressivement son vocabulaire. Le fait de pouvoir apprendre à son rythme rend l’apprentissage agréable et motivant. Je recommande !",
+  },
+  {
+    pseudo: "Zaynab",
+    note: null,
+    texte:
+      "J’utilise Arabiya+ dans mon apprentissage de la langue arabe et honnêtement tout est bien fait sur le site. La méthodologie est claire, le vocabulaire est riche, j’ai énormément appris et les dialogues ajoutés à la fin permettent de voir dans quel contexte les mots appris sont utilisés. C’est un programme très riche, très structuré, ce qui permet d’avancer clairement et efficacement. Même en ayant déjà des bases en m’inscrivant, j’ai appris plein de nouveaux mots et phrases à utiliser au quotidien.",
+  },
 ];
 
 export default async function LandingPage() {
@@ -343,6 +361,32 @@ export default async function LandingPage() {
           </div>
         )}
 
+        {/* Témoignages — retours réels d'apprenants abonnés, recueillis par email
+            avec leur accord. Section masquée automatiquement tant qu'il n'y a
+            aucun témoignage disponible. */}
+        {TEMOIGNAGES.length > 0 && (
+          <div className="mt-24">
+            <p className="text-gold-light uppercase tracking-widest text-sm font-semibold text-center mb-3">
+              Ils apprennent avec Arabiya+
+            </p>
+            <h2 className="text-3xl font-bold text-center mb-4">
+              Ce qu'en disent nos apprenants
+            </h2>
+            <p className="text-center opacity-70 max-w-xl mx-auto mb-12">
+              Des retours d'apprenants qui utilisent la plateforme au quotidien,
+              publiés avec leur accord.
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-5 max-w-3xl mx-auto">
+              {TEMOIGNAGES.map((t) => (
+                <Temoignage key={t.pseudo} pseudo={t.pseudo} note={t.note}>
+                  {t.texte}
+                </Temoignage>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Comparatif — répond à l'objection silencieuse "pourquoi pas un prof ?" sans dévaloriser cette option */}
         <div className="mt-24">
           <p className="text-gold-light uppercase tracking-widest text-sm font-semibold text-center mb-3">
@@ -441,6 +485,33 @@ function Feature({ icon, title, children }) {
       <div className="text-gold-light mb-3">{icon}</div>
       <h3 className="font-semibold mb-2">{title}</h3>
       <p className="text-base opacity-70">{children}</p>
+    </div>
+  );
+}
+
+function Temoignage({ pseudo, note, children }) {
+  return (
+    <div className="bg-ink-2/60 border border-gold/20 rounded-2xl p-6 flex flex-col">
+      <Quote size={22} className="text-gold-light/60 mb-3" />
+
+      {note ? (
+        <div className="flex gap-0.5 mb-3" aria-label={`Note : ${note} sur 5`}>
+          {Array.from({ length: note }).map((_, i) => (
+            <Star key={i} size={16} className="text-gold-light fill-gold-light" />
+          ))}
+        </div>
+      ) : null}
+
+      <p className="text-base opacity-80 italic leading-relaxed flex-1">
+        {children}
+      </p>
+
+      <p className="mt-4 pt-4 border-t border-gold/10 text-sm font-semibold text-gold-light">
+        {pseudo}
+        <span className="block text-xs font-normal opacity-60 not-italic">
+          Apprenant Arabiya+
+        </span>
+      </p>
     </div>
   );
 }
