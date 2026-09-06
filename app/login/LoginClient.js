@@ -48,8 +48,13 @@ export default function LoginClient() {
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full border-2 border-black/10 rounded-xl px-3 py-2 mb-4"
+          className="w-full border-2 border-black/10 rounded-xl px-3 py-2 mb-2"
         />
+        <p className="text-sm text-right mb-4">
+          <Link href="/mot-de-passe-oublie" className="underline opacity-70 hover:opacity-100">
+            Mot de passe oublié ?
+          </Link>
+        </p>
         {error && <p className="text-rust text-base mb-4">{error}</p>}
         <button
           type="submit"
