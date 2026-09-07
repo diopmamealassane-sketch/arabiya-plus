@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
-   export default function SignupClient() {
+export default function SignupClient() {
   const supabase = createClient();
   const [fullName, setFullName] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -18,21 +18,27 @@ import { createClient } from "@/lib/supabase/client";
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    const baseUrl =
+      process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+
     const { error } = await supabase.auth.signUp({
-      email,
+      email: email.trim().toLowerCase(),
       password,
       options: {
         data: {
           full_name: fullName.trim(),
           display_name: displayName.trim(),
         },
-        // Sans ceci, le lien de confirmation renvoie vers l'URL "Site URL"
-        // par défaut configurée dans Supabase (probablement la page
-        // d'accueil) au lieu du dashboard — un clic perdu de plus dans
-        // le funnel inscription → première leçon.
-        emailRedirectTo: `${window.location.origin}/dashboard`,
+        // Le lien de confirmation DOIT pointer vers un route handler,
+        // pas vers une page. /auth/callback échange le paramètre `code`
+        // contre une vraie session, puis redirige vers /dashboard.
+        // Pointer directement sur /dashboard confirmait l'email sans
+        // jamais créer la session : l'utilisateur retombait sur /login.
+        emailRedirectTo: `${baseUrl}/auth/callback?next=/dashboard`,
       },
     });
+
     setLoading(false);
     if (error) {
       setError(error.message);
@@ -47,13 +53,17 @@ import { createClient } from "@/lib/supabase/client";
         <div className="bg-parchment text-ink rounded-2xl p-8 w-full max-w-sm text-center float-in">
           <h1 className="text-xl font-bold mb-3">Vérifiez votre email</h1>
           <p className="text-base opacity-70 mb-4">
-            Un lien de confirmation vient de vous être envoyé à <strong>{email}</strong>.
-            Cliquez dessus pour activer votre compte et accéder directement à votre parcours.
+            Un lien de confirmation vient de vous être envoyé à{" "}
+            <strong>{email}</strong>. Cliquez dessus pour activer votre compte
+            et accéder directement à votre parcours.
           </p>
           <p className="text-sm opacity-60">
-            Vous ne le voyez pas ? Vérifiez vos <strong>spams / courriers indésirables</strong> —
-            ou <Link href="/login" className="underline">réessayez de vous connecter</Link> dans
-            quelques minutes.
+            Vous ne le voyez pas ? Vérifiez vos{" "}
+            <strong>spams / courriers indésirables</strong> — ou{" "}
+            <Link href="/login" className="underline">
+              réessayez de vous connecter
+            </Link>{" "}
+            dans quelques minutes.
           </p>
         </div>
       </main>
@@ -62,13 +72,22 @@ import { createClient } from "@/lib/supabase/client";
 
   return (
     <main className="geo-bg min-h-screen flex items-center justify-center px-4">
-      <form onSubmit={handleSubmit} className="bg-parchment text-ink rounded-2xl p-8 w-full max-w-sm float-in">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-parchment text-ink rounded-2xl p-8 w-full max-w-sm float-in"
+      >
         <Link href="/" className="block">
-          <img src="/logo-mark.png" alt="Arabiya+" className="h-24 w-auto mx-auto mb-5" />
+          <img
+            src="/logo-mark.png"
+            alt="Arabiya+"
+            className="h-24 w-auto mx-auto mb-5"
+          />
         </Link>
         <h1 className="text-xl font-bold mb-6">Créer un compte</h1>
 
-        <label className="block text-base font-semibold mb-1">Nom et prénom</label>
+        <label className="block text-base font-semibold mb-1">
+          Nom et prénom
+        </label>
         <input
           type="text"
           required
@@ -100,7 +119,10 @@ import { createClient } from "@/lib/supabase/client";
           onChange={(e) => setEmail(e.target.value)}
           className="w-full border-2 border-black/10 rounded-xl px-3 py-2 mb-4"
         />
-        <label className="block text-base font-semibold mb-1">Mot de passe</label>
+
+        <label className="block text-base font-semibold mb-1">
+          Mot de passe
+        </label>
         <input
           type="password"
           required
@@ -109,7 +131,9 @@ import { createClient } from "@/lib/supabase/client";
           onChange={(e) => setPassword(e.target.value)}
           className="w-full border-2 border-black/10 rounded-xl px-3 py-2 mb-4"
         />
+
         {error && <p className="text-rust text-base mb-4">{error}</p>}
+
         <button
           type="submit"
           disabled={loading}
@@ -117,8 +141,12 @@ import { createClient } from "@/lib/supabase/client";
         >
           {loading ? "Création…" : "Créer mon compte"}
         </button>
+
         <p className="text-base text-center mt-4 opacity-70">
-          Déjà inscrit ? <Link href="/login" className="underline">Connectez-vous</Link>
+          Déjà inscrit ?{" "}
+          <Link href="/login" className="underline">
+            Connectez-vous
+          </Link>
         </p>
       </form>
     </main>
