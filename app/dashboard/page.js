@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Flame, Star, ArrowRight, Brain, Trophy } from "lucide-react";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import LearningPath from "@/components/LearningPath";
+import ManageSubscriptionButton from "@/components/ManageSubscriptionButton";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +43,12 @@ export default async function DashboardPage() {
     (progress ?? []).map((p) => [p.lesson_id, p.status])
   );
   const isPremium = subscription?.status === "active";
+
+  // Le bouton "Gérer mon abonnement" s'affiche pour tout abonné Stripe
+  // (actif, en essai ou en défaut de paiement) — un abonné "past_due"
+  // doit justement pouvoir changer sa carte bancaire.
+  const hasStripeSubscription =
+    !!subscription?.status && subscription.status !== "canceled";
 
   // Group units by cycle, preserving the cycle order already applied by the query
   const unitsByCycle = [];
@@ -190,6 +197,14 @@ export default async function DashboardPage() {
           <p className="text-center text-ink/50 text-base py-20">
             Aucun contenu pour le moment — exécutez le seed Supabase pour voir la leçon de démonstration.
           </p>
+        )}
+
+        {hasStripeSubscription && (
+          <ManageSubscriptionButton
+            email={user.email}
+            pastDue={subscription.status === "past_due"}
+            className="mt-10"
+          />
         )}
       </div>
     </main>
